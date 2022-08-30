@@ -1,0 +1,13 @@
+Modes 
+    Collect Original: Copy used original footage (save complete footage) into another folder
+    Collect Snippets: Render out used snipptes 
+    Options: 
+            
+            remove Fade (sets )
+            
+            Rebuild (new Blend file using the new Created Footage)
+            [] original resolution ()
+
+
+Rebuild: 
+    save current as new blendfile into new folder, replace linked pathes with the new generated 
