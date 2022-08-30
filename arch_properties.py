@@ -4,8 +4,8 @@ import bpy
 class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
    # CenterObj: bpy.props.PointerProperty(name="Object", type=Object)
 
-    new_folder_name: bpy.props.StringProperty(
-        name="NewFolder", default="BackUp")
+    target_folder: bpy.props.StringProperty(
+        name="Target Folder", subtype = "DIR_PATH")
     #CutThickness: bpy.props.FloatProperty(
     #    name="Maintcut Thickness", default=0.04, min=0.0)
     
@@ -13,4 +13,6 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
     #    name="Linecount", default=1, min=0)
     remove_fade: bpy.props.BoolProperty(
         name="Remove Fade", default=True)
+
+    
     

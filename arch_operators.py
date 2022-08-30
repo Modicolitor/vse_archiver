@@ -1,7 +1,7 @@
 import bpy 
 
 from .arch_properties import VSE_Archiver_PropGroup
-
+from .arch_functions import collect_originals
 
 class PP_OT_Initialize_Archiver(bpy.types.Operator):
     '''Archiv Project with the chosen Setting'''
@@ -35,5 +35,6 @@ class PP_OT_Archiv_VSE(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        
+        print('start operator')
+        collect_originals(context)
         return{"FINISHED"}

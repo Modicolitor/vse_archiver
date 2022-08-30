@@ -28,8 +28,8 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
 
             subcol.operator("varch.archive", text="Archiv",
                             icon="PLUS")  # zeige button an
-            subcol.property(arch_props, "remove_fade")
-            subcol.property(arch_props, "new_folder_name")
+            subcol.prop(arch_props, "remove_fade")
+            subcol.prop(arch_props, "target_folder")
 
         else:
 
