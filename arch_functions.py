@@ -41,7 +41,7 @@ def get_imgseq_target_path(context, filename, n, directory):
     filename, extension = os.path.splitext(filename)
     subfoldername = get_none_numbername(filename) + str(n)
     targetpath = os.path.join(targetpath, subfoldername)
-    video_target_path = os.path.join(targetpath, filename)
+    video_target_path = targetpath 
     return video_target_path
 
 def get_none_numbername(filename):
@@ -116,8 +116,9 @@ def collect_originals(context):
                 directory = seq.directory
                 print('directory')
                 n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
+                print(f'seq.elements[0].filename is {seq.elements[0].filename} and n is {n} and directory is {directory}')
                 targetpath = get_imgseq_target_path(context, seq.elements[0].filename,n, directory)
-                
+                print(f'targetpath is {targetpath}')
                 imgseq_directories[directory] = targetpath
                 for ele in seq.elements:
                     filepath = os.path.join(directory, ele.filename) ####function naming confusing
