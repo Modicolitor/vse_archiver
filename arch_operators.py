@@ -30,11 +30,15 @@ class PP_OT_Archiv_VSE(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        
+        arch_props = context.scene.vse_archiver
+        target_folder = arch_props
        
-        return True
+        return target_folder != None or target_folder[0] == '/' and target_folder[1] == '/'
 
     def execute(self, context):
         print('start operator')
         collect_originals(context)
+        
+        self.report(
+                {'WARNING'}, "You are in the new archived blend file, now!!!")
         return{"FINISHED"}

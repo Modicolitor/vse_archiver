@@ -11,3 +11,25 @@ Modes
 
 Rebuild: 
     save current as new blendfile into new folder, replace linked pathes with the new generated 
+
+
+
+
+
+einschränkungen:
+- only the active scene is saved
+
+
+
+
+Test: 
+
+[] what about files with relative pathes????
+[] does it work with metastrips? 
+[] scene strips --> render out ? 
+[] strips in other scene
+
+
+todo
+[] prompt when path is relative or compensate 
+[] poll for path is relativ
