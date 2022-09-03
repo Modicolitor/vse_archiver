@@ -26,10 +26,20 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
             arch_props = context.scene.vse_archiver
             subcol = col.column()
 
-            subcol.operator("varch.archive", text="Archiv",
-                            icon="PLUS")  # zeige button an
-            subcol.prop(arch_props, "remove_fade")
+            subcol.prop(arch_props, "mode")
             subcol.prop(arch_props, "target_folder")
+            subcol.prop(arch_props, "rebuild", text='Rebuild Blend')
+
+            if arch_props.mode == '1':
+                
+                subcol.operator("varch.coloriginal", text="Archiv Originals",
+                                icon="COPYDOWN")
+            
+            if arch_props.mode == '2':
+                subcol.prop(arch_props, "remove_fade")
+                subcol.operator("varch.colsnippets", text="Archiv Snippets",
+                                icon="RESTRICT_RENDER_OFF")
+                
 
         else:
 

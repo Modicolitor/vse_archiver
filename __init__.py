@@ -28,7 +28,8 @@ bl_info = {  # für export als addon
 # )
 
 
-from .arch_operators import PP_OT_Archiv_VSE
+from .arch_operators import PP_OT_Collect_VSE_Original
+from .arch_operators import PP_OT_Render_VSE_Snippets
 from .arch_operators import PP_OT_Initialize_Archiver
 from .arch_ui import PP_PT_VSEArchiver_Menu
 from .arch_properties import VSE_Archiver_PropGroup
@@ -39,7 +40,8 @@ from .arch_properties import VSE_Archiver_PropGroup
 # Centerobj Pointer
 
 
-classes = (    PP_OT_Archiv_VSE,
+classes = (    PP_OT_Collect_VSE_Original,
+    PP_OT_Render_VSE_Snippets,
     PP_OT_Initialize_Archiver,
        PP_PT_VSEArchiver_Menu,
        VSE_Archiver_PropGroup,

@@ -9,6 +9,8 @@ Modes
             [] original resolution ()
 
 
+    Collect Linked data: Collect images, linked blend files, 
+
 Rebuild: 
     save current as new blendfile into new folder, replace linked pathes with the new generated 
 
@@ -28,8 +30,24 @@ Test:
 [] does it work with metastrips? 
 [] scene strips --> render out ? 
 [] strips in other scene
-
+[] negativ frame starts when rendering
 
 todo
 [] prompt when path is relative or compensate 
 [] poll for path is relativ
+
+[] check compositor for used files
+[] check movieclip editor 
+[] handle scene strips
+[] fade 
+[] ignore hiden strips
+
+is footage only used in metastrip --> ignore about when render_metastrip = True
+
+
+2.0
+[] archive only selected 
+[] Archive Blend 
+
+
+
