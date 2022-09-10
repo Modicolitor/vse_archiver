@@ -1,7 +1,7 @@
 import bpy 
 
-from .arch_properties import VSE_Archiver_PropGroup
-from .arch_functions import collect_originals, collect_snippets
+from .vse-arch_properties import VSE_Archiver_PropGroup
+from .vse-arch_functions import collect_originals, collect_snippets
 
 class PP_OT_Initialize_Archiver(bpy.types.Operator):
     '''Archiv Project with the chosen Setting'''

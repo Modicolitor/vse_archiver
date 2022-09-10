@@ -28,11 +28,11 @@ bl_info = {  # für export als addon
 # )
 
 
-from .arch_operators import PP_OT_Collect_VSE_Original
-from .arch_operators import PP_OT_Render_VSE_Snippets
-from .arch_operators import PP_OT_Initialize_Archiver
-from .arch_ui import PP_PT_VSEArchiver_Menu
-from .arch_properties import VSE_Archiver_PropGroup
+from .vse-arch_operators import PP_OT_Collect_VSE_Original
+from .vse-arch_operators import PP_OT_Render_VSE_Snippets
+from .vse-arch_operators import PP_OT_Initialize_Archiver
+from .vse-arch_ui import PP_PT_VSEArchiver_Menu
+from .vse-arch_properties import VSE_Archiver_PropGroup
 
 
 '''define the Centerobject and make it globally avaiable'''
