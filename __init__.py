@@ -26,14 +26,16 @@ bl_info = {  # für export als addon
 # modules = addon_auto_imports.setup_addon_modules(
 #    __path__, __name__, ignore_packages=[], ignore_modules=[]
 # )
-''' hallo'''
 
-from .vse-arch_operators import PP_OT_Collect_VSE_Original
-from .vse-arch_operators import PP_OT_Render_VSE_Snippets
-from .vse-arch_operators import PP_OT_Initialize_Archiver
-from .vse-arch_ui import PP_PT_VSEArchiver_Menu
-from .vse-arch_properties import VSE_Archiver_PropGroup
-from .bl-arch_properties import Bl_Archiver_PropGroup
+
+from .vse_arch_operators import PP_OT_Collect_VSE_Original 
+from .vse_arch_operators import PP_OT_Render_VSE_Snippets
+from .vse_arch_operators import PP_OT_Initialize_Archiver
+from .vse_arch_ui import PP_PT_VSEArchiver_Menu
+from .vse_arch_properties import VSE_Archiver_PropGroup
+from .bl_archiver_properties import Bl_Archiver_PropGroup
+from .bl_archiver_operators import BA_OT_Initialize_Bl_Archiver
+from .bl_archiver_ui import BA_PT_BlArchiver_Menu
 
 
 
@@ -45,6 +47,10 @@ classes = (    PP_OT_Collect_VSE_Original,
     PP_OT_Initialize_Archiver,
        PP_PT_VSEArchiver_Menu,
        VSE_Archiver_PropGroup,
+       Bl_Archiver_PropGroup,
+       BA_PT_BlArchiver_Menu,
+       BA_OT_Initialize_Bl_Archiver,
+
        )
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)
