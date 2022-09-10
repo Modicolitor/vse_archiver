@@ -26,16 +26,16 @@ bl_info = {  # für export als addon
 # modules = addon_auto_imports.setup_addon_modules(
 #    __path__, __name__, ignore_packages=[], ignore_modules=[]
 # )
-
+''' hallo'''
 
 from .vse-arch_operators import PP_OT_Collect_VSE_Original
 from .vse-arch_operators import PP_OT_Render_VSE_Snippets
 from .vse-arch_operators import PP_OT_Initialize_Archiver
 from .vse-arch_ui import PP_PT_VSEArchiver_Menu
 from .vse-arch_properties import VSE_Archiver_PropGroup
+from .bl-arch_properties import Bl_Archiver_PropGroup
 
 
-'''define the Centerobject and make it globally avaiable'''
 
 # Centerobj Pointer
 
