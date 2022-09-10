@@ -250,7 +250,7 @@ def collect_snippets(context):
     imgseq_directories = {}
     #  gehe durch sequences
     for scene in bpy.data.scenes:
-        sequences = scene.sequence_editor.sequences_all
+        sequences = get_visible_sequences( scene)#  scene.sequence_editor.sequences_all)
         for seq in sequences:
             answer = copy_or_render(context, seq)
             if answer == 'COPY':
@@ -269,7 +269,7 @@ def collect_snippets(context):
     
 def get_visible_sequences(scene):
     vis = []
-    for seq in scene.sequence_editor.sequences_all:
+    for seq in scene.sequence_editor.sequences: #_all
         if not seq.mute:
             vis.append(seq)
     return vis
@@ -294,8 +294,8 @@ def render_sequence(context, seq, scene):
     init_end = copy.copy(context.scene.frame_end)
 
     ##!!!!!!!!!!!! problems when negativ !!!!!!!!!!!
-    render_start = seq.frame_start
-    render_end = seq.frame_final_duration #end
+    render_start = seq.frame_final_start
+    render_end = seq.frame_final_end
     
     # set new frame range 
     context.scene.frame_start = render_start
@@ -303,7 +303,7 @@ def render_sequence(context, seq, scene):
     # copy list of visible sequences 
     vis_seqs = get_visible_sequences(scene)
     #hide_all sequences but the active 
-    set_vis_for_render(seq, scene)
+    #set_vis_for_render(seq, scene)
     
     #set video render
     context.scene.render.image_settings.file_format = 'FFMPEG'
@@ -312,6 +312,7 @@ def render_sequence(context, seq, scene):
     # set new name and folder rendering
     #actually filepath, try how split reachts to a simple name
     renderpath = get_video_target_path(context, seq.name)
+    renderpath = renderpath + '.mp4'
     print(renderpath)
     bpy.data.scenes["Scene"].render.filepath = renderpath
     # render sequence 
@@ -319,8 +320,8 @@ def render_sequence(context, seq, scene):
 
     
     # reset 
-    context.scene.frame_start = init_start
-    context.scene.frame_end = init_end
+    #context.scene.frame_start = init_start
+    #context.scene.frame_end = init_end
     set_sequences_visibility(vis_seqs, scene)
 
 def copy_or_render(context, seq):

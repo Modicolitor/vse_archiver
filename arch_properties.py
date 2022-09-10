@@ -43,19 +43,19 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name="Render Image Sequence", default=True, description='When checked Imagesequences will be rendered out, rather than copied')
 
     render_image: bpy.props.BoolProperty(
-        name="Render Image", default=True, description='When checked single images will be rendered out, rather than copied')
+        name="Render Image", default=False, description='When checked single images will be rendered out, rather than copied')
 
     render_scenestrip: bpy.props.BoolProperty(
-        name="Render Scene Strip", default=True, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
+        name="Render Scene Strip", default=False, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
 
     render_audio: bpy.props.BoolProperty(
-        name="Render Audio Strip", default=True, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
+        name="Render Audio Strip", default=False, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
 
     render_metastrip: bpy.props.BoolProperty(
         name="Render Meta Strip", default=True, description='When checked each Metastrip is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
     
     render_movie: bpy.props.BoolProperty(
-        name="Render Movie", default=True, description='When checked each Movie is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
+        name="Render Movie", default=False, description='When checked each Movie is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
 
 
     meta_strip_depth: bpy.props.IntProperty(
