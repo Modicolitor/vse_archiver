@@ -36,6 +36,7 @@ from .vse_arch_properties import VSE_Archiver_PropGroup
 from .bl_archiver_properties import Bl_Archiver_PropGroup
 from .bl_archiver_operators import BA_OT_Initialize_Bl_Archiver
 from .bl_archiver_ui import BA_PT_BlArchiver_Menu
+from .bl_archiver_operators import BA_OT_Blend_Network
 
 
 
@@ -50,7 +51,7 @@ classes = (    PP_OT_Collect_VSE_Original,
        Bl_Archiver_PropGroup,
        BA_PT_BlArchiver_Menu,
        BA_OT_Initialize_Bl_Archiver,
-
+    BA_OT_Blend_Network,
        )
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)

@@ -25,7 +25,7 @@ class BA_PT_BlArchiver_Menu(bpy.types.Panel):
             arch_props = context.scene.bl_archiver
             subcol = col.column()
 
-            #subcol.prop(arch_props, "mode")
+            subcol.operator('blarch.colfilenetwork', text="Collect File Network", icon="RESTRICT_RENDER_OFF")
             subcol.prop(arch_props, "use_blend_data")
             #subcol.prop(arch_props, "rebuild", text='Rebuild Blend')
 
