@@ -1,6 +1,6 @@
 import bpy
-from .bl_archiver_properties import Bl_Archiver_PropGroup
-from .bl_archiver_functions import start_archiving
+
+from .bl_archiver_functions import start_archiving, gen_properties
 
 class BA_OT_Initialize_Bl_Archiver(bpy.types.Operator):
     '''Archiv Project with the chosen Setting'''
@@ -16,7 +16,8 @@ class BA_OT_Initialize_Bl_Archiver(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        bpy.types.Scene.bl_archiver = bpy.props.PointerProperty(type=Bl_Archiver_PropGroup)
+        gen_properties(context)
+        #bpy.types.Scene.bl_archiver = bpy.props.PointerProperty(type=Bl_Archiver_PropGroup)
         #bpy.types.Sequences.render_to_archive = bpy.props.BoolProperty(name='RenderThisStrip', default=False)
         return{"FINISHED"}
 
