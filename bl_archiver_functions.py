@@ -1,6 +1,7 @@
 import bpy
 import os
 from .bl_archiver_properties import Bl_Archiver_PropGroup
+from pathlib import Path
 
 from .vse_arch_functions import collect_moviclips, collect_sounds,collect_images
 '''
@@ -63,6 +64,45 @@ def load_handler(context: bpy.context):#all_filepathes
     return res # all_filepathes
 
 bpy.app.handlers.load_post.append(load_handler)
+
+
+
+def write_json(all_filepathes, json_filepath):
+        data = {}
+        data['rasps'] = []
+        for d in self.Rasplist:
+            data['rasps'].append({
+                'name': d.name,
+                'IP': d.IP,
+                'Songs': d.songs,
+                'description': d.description,
+                'is_video_pi': d.is_video_pi
+            })
+
+        with open('user_rasps.json', 'w') as outfile:
+            json.dump(data, outfile)
+        print('I write json')
+
+def read_json(all_filepathes, json_filepath):
+    #filename = "user_rasps.json"
+
+    #folderpath = FM.appdatafoldername
+    #path = join(folderpath, filename)
+
+    my_file = Path("user_rasps.json")
+    if my_file.is_file():
+        with open('user_rasps.json') as json_file:
+            data = json.load(json_file)
+            for p in data['rasps']:
+                # print(f"generating {p.name}")
+                rsp = Raspberry(parent=self)
+                rsp.name = p['name']
+                rsp.IP = p['IP']
+                rsp.songs = p['Songs']
+                rsp.description = p['description']
+                rsp.is_video_pi = p['is_video_pi']
+
+    print('Im reading json')
 
 
 

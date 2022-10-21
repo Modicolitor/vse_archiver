@@ -1,5 +1,10 @@
 import bpy
 #from bpy.types import Scene, Image, Object
+class VSE_Archiver_MetaStrip(bpy.types.PropertyGroup):
+    name:bpy.props.StringProperty(
+        name="Video Folder Name", default = 'Video')
+    render_inside:bpy.props.BoolProperty(
+        name="Render Inside", default=False)
 
 class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
    # CenterObj: bpy.props.PointerProperty(name="Object", type=Object)
@@ -58,5 +63,7 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name="Render Movie", default=False, description='When checked each Movie is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
 
 
-    meta_strip_depth: bpy.props.IntProperty(
-        name="Meta Strip Depth", default=0, min=0)
+    #meta_strip_depth: bpy.props.IntProperty(
+    #    name="Meta Strip Depth", default=0, min=0)
+    
+    metastrips:bpy.props.CollectionProperty(type=VSE_Archiver_MetaStrip)

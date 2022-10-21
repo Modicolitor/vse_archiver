@@ -13,3 +13,6 @@ class Bl_Archiver_PropGroup(bpy.types.PropertyGroup):
     
     is_main_file: bpy.props.BoolProperty(
         name="Is Main File", default=False, description="used to close the right files and not the main")
+    
+    json_filepath:bpy.props.StringProperty(
+        name="Json Path", subtype = "DIR_PATH")

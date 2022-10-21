@@ -65,6 +65,8 @@ def list_from_dictionary(dict):
     for ele in dict.keys():
         list.append(ele)
     return list 
+
+
     
 def get_directorynumber(directory, imgdirectories):
     keyslist = list_from_dictionary(imgdirectories)
@@ -77,6 +79,8 @@ def get_directorynumber(directory, imgdirectories):
 
         n = len(keyslist) # last new element
         return n, imgdirectories
+    
+
 
 def split_filepath(filepath):
     path, basename = ntpath.split(filepath)
@@ -387,3 +391,34 @@ def get_sequence_type(context, seq):
     else:
         return seq.type
     
+def reset_metastrips(context):
+    for sc in bpy.data.scenes:
+        #sequences = sc.sequence_editor.sequences_all
+        arch_metastrips = sc.vse_archiver.metastrips
+        
+        for n,ele in enumerate(arch_metastrips):
+            arch_metastrips.remove(n)
+    update_metastrips(context)
+
+####adds metastrips that are not present yet in the list ; renaming strips,  after making   
+def update_metastrips(context):
+    print('in updates ')
+    
+    ######################PROBLEM In verschiedenen Scenen können Strips den gleich namen haben, nur nicht innerhalb der scene, aber es ist ja eh per scene gespeichert 
+    for sc in bpy.data.scenes:
+        sequences = sc.sequence_editor.sequences_all
+        arch_metastrips = sc.vse_archiver.metastrips
+        
+        for seq in sequences:
+            print(f'seq {seq.name} ')
+            if seq.type == 'META':
+                if seq.name not in arch_metastrips:
+                    print(f'ele {seq.name} ')
+                    ele = arch_metastrips.add()
+                    ele.name = seq.name 
+    
+        ####looks for old metastrip data with no counter part in the current state  
+        for ele in arch_metastrips:
+            if ele.name not in sequences:
+                arch_metastrips.remove(ele.name)
+               
