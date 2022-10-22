@@ -58,11 +58,11 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 subcol.operator("varch.colsnippets", text="Archiv Snippets",
                                 icon="RESTRICT_RENDER_OFF")
                 
-            if not has_equal_metas(context):
-                subcol.label(text="Metastriplist needs Update")
-            
-            subcol.operator("varch.updmeta", text="Update Metastrip List", icon="FILE_REFRESH")
-            subcol.operator("varch.resetmeta", text="Reset Metastrip List", icon="TRACKING_CLEAR_BACKWARDS")
+                if not has_equal_metas(context):
+                    subcol.label(text="Metastriplist needs Update")
+                
+                subcol.operator("varch.updmeta", text="Update Metastrip List", icon="FILE_REFRESH")
+                subcol.operator("varch.resetmeta", text="Reset Metastrip List", icon="TRACKING_CLEAR_BACKWARDS")
                 
             active = context.active_sequence_strip
             if active.name in arch_props.metastrips:

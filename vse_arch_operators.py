@@ -96,7 +96,7 @@ class PP_OT_Arch_ResetMetastrip(bpy.types.Operator):
     '''Update Metastrip list'''
 
     bl_label = "Update Metastrip list"
-    bl_idname = "varch.updmeta"
+    bl_idname = "varch.resetmeta"
     bl_options = {'REGISTER', "UNDO"}
 
     @classmethod
