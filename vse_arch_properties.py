@@ -30,14 +30,20 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
     
     target_audio_folder: bpy.props.StringProperty(
         name="Audio Folder Name", default = 'Audio')
+    
+    target_image_folder: bpy.props.StringProperty(
+        name="Single Image Folder Name", default = 'SingleImg')
 
     target_imgseq_folder: bpy.props.StringProperty(
         name="Image Sequence Folder Name", default = 'ImgSequences')
+    
+    target_font_folder: bpy.props.StringProperty(
+        name="Fonts Folder Name", default = 'Fonts')
 
     mode: bpy.props.EnumProperty(
         name='',  # SingleCoupltypes
         description='List of forms avaiable in single connector mode',
-        default='1',
+        default='2',
         items=[('1', 'Collect Original', ''),
                ('2', 'Collect Snippets', ''),
                ('3', 'Collect Blend Elements', ''),
@@ -51,16 +57,16 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name="Render Image", default=False, description='When checked single images will be rendered out, rather than copied')
 
     render_scenestrip: bpy.props.BoolProperty(
-        name="Render Scene Strip", default=False, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
+        name="Render Scene Strip", default=True, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
 
     render_audio: bpy.props.BoolProperty(
-        name="Render Audio Strip", default=False, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
+        name="Render Audio Strip", default=True, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
 
     render_metastrip: bpy.props.BoolProperty(
         name="Render Meta Strip", default=True, description='When checked each Metastrip is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
     
     render_movie: bpy.props.BoolProperty(
-        name="Render Movie", default=False, description='When checked each Movie is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
+        name="Render Movie", default=True, description='When checked each Movie is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
 
 
     #meta_strip_depth: bpy.props.IntProperty(

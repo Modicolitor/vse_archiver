@@ -15,7 +15,7 @@ def has_equal_metas(context):
         arch_metastrips = sc.vse_archiver.metastrips
         arch_count += len(arch_metastrips)
         
-    print(f'sequence count is {c} and archiver metacount {arch_count}')
+    #print(f'sequence count is {c} and archiver metacount {arch_count}')
     return c == arch_count
        
         
@@ -64,11 +64,20 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 subcol.operator("varch.updmeta", text="Update Metastrip List", icon="FILE_REFRESH")
                 subcol.operator("varch.resetmeta", text="Reset Metastrip List", icon="TRACKING_CLEAR_BACKWARDS")
                 
-            active = context.active_sequence_strip
-            if active.name in arch_props.metastrips:
-                subcol.prop(arch_props.metastrips[active.name], "render_inside")
+                active = context.active_sequence_strip
+                if active != None:
+                    if active.name in arch_props.metastrips:
+                        subcol.prop(arch_props.metastrips[active.name], "render_inside")
+                    
                 
-                
+                box = col.box()
+                box.prop(arch_props, "render_image")
+                box.prop(arch_props, "render_imagesequence")
+                box.prop(arch_props, "render_scenestrip")
+                box.prop(arch_props, "render_audio")
+                box.prop(arch_props, "render_metastrip")
+                box.prop(arch_props, "render_movie")
+
 
         else:
 

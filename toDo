@@ -21,12 +21,28 @@ Rebuild:
 einschränkungen:
 - only the active scene is saved
 
+Einschränkungen 
+
+restricted to mp4 
+
+what about effects strips getting removed when changing the 
+
+Bugs: 
+Copy original: 
+    [+] Sounds which are connected to videos should be reconnected to the video folder and not audio
+    [ ] some images are relinked to the false Directory folder but files are copied to the right folder getting same key
+    [] fonts not supported
+
+    []  different videos with the same name in different folders are getting copied into one folder propably overwriten
+    [] archiving to the same File/Folder
+what else could be missing: 
+- caches? 
 
 
 
 Test: 
 
-[] what about files with relative pathes????
+[+] what about files with relative pathes????
 [] does it work with metastrips? 
 [] scene strips --> render out ? 
 [] strips in other scene
