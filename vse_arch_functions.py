@@ -9,16 +9,38 @@ from .vse_arch_definitions import is_audio, is_video
 def copy_file(src, dst):
     shutil.copy2(src, dst)
 
-def get_video_target_path(context, filepath):
+def get_video_target_path(context, filepath, vid_directories):
+    #print(f'In get video path filepath {filepath} directory {directory} vid_directories {vid_directories} ')
     arch_props = context.scene.vse_archiver
     targetfolder = arch_props.target_folder
     videofolder = arch_props.target_video_folder
-    path, basename = split_filepath(filepath)
-
+    
+    directory, basename = split_filepath(filepath)
+    print(f'audio target path beginning dir {directory} basename {basename}')
     #'target_folder'\videofolder\basename 
     targetpath = os.path.join(targetfolder, videofolder)
-    video_target_path = os.path.join(targetpath, basename)
-    return video_target_path
+    
+    
+    if directory in vid_directories:
+        #already got that folder
+        targetpath = vid_directories[directory]
+        #targetpath, wrongbasename = os.path.split(targetpathOtherfile)
+        #print(f'targetpathOtherfile')
+        video_targetpath = os.path.join(targetpath, basename) 
+        print(f'al/found in vid dict path {filepath} aud target path {video_targetpath}')
+    else:   
+        ignore, subfoldername = os.path.split(directory)
+        #print(f'subfolder name is {subfoldername}')
+        n, vid_directories = get_directorynumber(directory, vid_directories)
+        subfoldername = subfoldername + "_" + str(n)
+        targetpath = os.path.join(targetpath, subfoldername)
+        video_targetpath = os.path.join(targetpath, basename)
+        print(f'new in vid folder path {filepath} aud target path {video_targetpath}')
+        
+    vid_directories[directory] = targetpath
+    print(f'after processing {filepath} vid_directories {vid_directories}')
+    return video_targetpath, vid_directories
+    
 
 '''def has_vid_connected_audio(context, filepath):
     
@@ -32,71 +54,111 @@ def get_video_target_path(context, filepath):
     print('*******NOT found Audio with filepath {filepath} to originate from a video')
     return False'''
 
-def get_audio_target_path(context, filepath):
-    
-    
+def get_audio_target_path(context, filepath, audio_directories, video_directories): 
     arch_props = context.scene.vse_archiver
     targetfolder = arch_props.target_folder
+    directory, basename = split_filepath(filepath)
+    print(f'audio target path beginning dir {directory} basename {basename}')
     if is_audio(filepath):
-        folder = arch_props.target_audio_folder
+        audiofolder = arch_props.target_audio_folder
+        if directory in audio_directories:
+            #already got that folder
+            targetpath = audio_directories[directory]
+            #targetpath, wrongbasename = os.path.split(targetpathOtherfile)
+            audio_target_path = os.path.join(targetpath, basename)
+            
+            print(f'path {filepath} aud target path {audio_target_path}')
+        else:
+            path, basename = os.path.split(filepath)
+            targetfolder = os.path.join(targetfolder, audiofolder)
+            n, audio_directories = get_directorynumber(directory, audio_directories)
+            ignore, subfoldername = os.path.split(directory)
+            #print(f'subfolder name is {subfoldername}')
+            subfoldername =subfoldername + "_" + str(n)
+           
+            target_folder = os.path.join(targetfolder, subfoldername)
+            audio_target_path = os.path.join(target_folder, basename)
+            print(f'path {filepath} aud target path {audio_target_path}')
+            audio_directories[directory] = target_folder
+    #not audio
     else:
-        folder = arch_props.target_video_folder
-    
-    path, basename = split_filepath(filepath)
+        videofolder = arch_props.target_video_folder
+        
+        if directory in video_directories :
+            #already got that folder
+            targetpathOtherfile = video_directories[directory]
+            targetpath, wrongbasename = os.path.split(targetpathOtherfile)
+            audio_target_path = os.path.join(targetpath, basename)
+            print(f'al/in vide dict path {filepath} aud target path {audio_target_path}')
+        else:   
+            targetpath = os.path.join(targetfolder, videofolder)
+            #targetfolder = os.path.join(targetfolder, audiofolder)
+            n, video_directories = get_directorynumber(directory, video_directories)
+            ignore, subfoldername = os.path.split(directory)
+            #print(f'subfolder name is {subfoldername}')
+            subfoldername =subfoldername + "_" + str(n)
+            target_folder = os.path.join(targetpath, subfoldername)
+            audio_target_path = os.path.join(target_folder, basename)
+            #imgseq_targetpath = targetpath 
+            
+            video_directories[directory] = target_folder
+            print(f'In New vid dcgt path {filepath} aud target path {audio_target_path}')
+            
+    return audio_target_path, audio_directories, video_directories
 
-    #'target_folder'\videofolder\basename 
-    targetpath = os.path.join(targetfolder, folder)
-    video_target_path = os.path.join(targetpath, basename)
-    return video_target_path
-
-def get_font_target_path(context, filepath):
+def get_font_target_path(context, filepath, font_directories ):
     arch_props = context.scene.vse_archiver
     targetfolder = arch_props.target_folder
     fontfolder = arch_props.target_font_folder
-    path, basename = split_filepath(filepath)
+    directory, basename = split_filepath(filepath)
 
     #'target_folder'\videofolder\basename 
-    targetpath = os.path.join(targetfolder, fontfolder)
-    font_target_path = os.path.join(targetpath, basename)
-    return font_target_path
+    #targetpath = os.path.join(targetfolder, fontfolder)
+    
+    
+    
+    if directory in font_directories:
+        #already got that folder
+        font_target_path = os.path.join(font_directories[directory], basename)
+    else:
+        n, font_directories = get_directorynumber(directory, font_directories)
+        target_fontfolder = os.path.join(targetfolder, fontfolder)
+        ignore, subfoldername = os.path.split(directory)
+        subfoldername =subfoldername + "_" + str(n)
+        target_folder = os.path.join(target_fontfolder,subfoldername)
+        font_target_path = os.path.join(target_folder, basename)
+        
+        font_directories[directory] = target_folder
+    
 
-def get_image_target_path(context, filepath, directory):
-    arch_props = context.scene.vse_archiver
-    targetfolder = arch_props.target_folder
-    videofolder = arch_props.target_image_folder
-    path, basename = split_filepath(filepath)
+    return font_target_path, font_directories
 
-    #'target_folder'\videofolder\basename 
-    targetpath = os.path.join(targetfolder, videofolder)
-    video_target_path = os.path.join(targetpath, basename)
-    return video_target_path
-
-def get_imgseq_target_path(context, filename, n, directory):
+def get_imgseq_target_path(context, filename, directory, imgseq_directories):
     arch_props = context.scene.vse_archiver
     targetfolder = arch_props.target_folder
     imgseqfolder = arch_props.target_imgseq_folder
-    #path, basename = split_filepath(filepath)
 
-    
-    
     #'target_folder'maintarget\imgseqfolder\
     targetpath = os.path.join(targetfolder, imgseqfolder)
     #print(f'in get target parth {filename}')
-    if directory in imgseqfolder:
+    if directory in imgseq_directories:
         #already got that folder
-        imgseq_targetpath = imgseqfolder[directory]
+        print(f'imseq_targetpathes  at {filename} are {imgseqfolder}')
+        imgseq_targetpath = imgseq_directories[directory]
+        
     else:   
-        #old filename, extension = os.path.splitext(filename)
-        #old subfoldername = get_none_numbername(filename) + str(n)
-        ''
         ignore, subfoldername = os.path.split(directory[:-1])
         #print(f'subfolder name is {subfoldername}')
-        subfoldername =subfoldername + str(n)
-        targetpath = os.path.join(targetpath, subfoldername)
-        imgseq_targetpath = targetpath 
-    return imgseq_targetpath
+        n, imgseq_directories = get_directorynumber(directory[:-1], imgseq_directories)
+        subfoldername =subfoldername + "_" + str(n)
+        target_folder = os.path.join(targetpath, subfoldername)
+        imgseq_targetpath = target_folder 
+    
+        imgseq_directories[directory]= target_folder
+    #print(f'get imseq path for subfolder {subfoldername}  filename {filename} imgseq_directories {imgseq_directories}')
+    return imgseq_targetpath, imgseq_directories
 
-def get_none_numbername(filename):
+'''def get_none_numbername(filename):
     forbiddens = ['0','1','2','3','4','5','6','7','8','9','.', ',']
    
     tester = True
@@ -104,11 +166,11 @@ def get_none_numbername(filename):
         if len(filename) == 0:
             tester = False
         elif filename[-1] in forbiddens:
-            print(filename)
+            #print(filename)
             filename = filename[:-1]
         else:
             tester = False
-    return filename
+    return filename'''
 
 def list_from_dictionary(dict):
     list = []
@@ -116,9 +178,14 @@ def list_from_dictionary(dict):
         list.append(ele)
     return list 
 
-
+def contentlist_from_dictionary(dict):
+    list = []
+    for ele in dict:
+        list.append(dict[ele])
+    return list 
     
 def get_directorynumber(directory, imgdirectories):
+    print(f'in direcory number got directory {directory} and directories {imgdirectories}')
     keyslist = list_from_dictionary(imgdirectories)
 
     if directory in imgdirectories:
@@ -137,47 +204,58 @@ def split_filepath(filepath):
     #print(f'got {filepath} return {path} and {basename}')
     return path, basename
 
-def get_target_filepath(filepath, target_folder):
+'''def get_target_filepath(filepath, target_folder):
     orifilepath, basename =  split_filepath(filepath)
-    return os.path.join(target_folder, basename)
+    return os.path.join(target_folder, basename)'''
 
 
 
-def sequence_to_copy(context, seq, filepathes, imgseq_directories): 
+def sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories): 
     type = get_sequence_type(context, seq)
     if type == 'MOVIE': #hasattr(seq, "filepath"): #videosequence
         #print(f'this has filepath: {seq.name}')
+        
+        ####from different directories 
+        directory, basename = os.path.split(seq.filepath)
+        #n, vid_directories = get_directorynumber(directory[:-1], vid_directories)
+        targetpath, vid_directories = get_video_target_path(context, seq.filepath, vid_directories)
+        #vid_directories[directory] = targetpath
+     
+        
         if seq.filepath not in filepathes:
-            filepathes[seq.filepath] = get_video_target_path(context, seq.filepath)
+            print(f'found {seq.filepath} already in filepathes')
+            filepathes[seq.filepath] = targetpath 
             #filepathes.append(seq.filepath)
+        else:
+            print(f'found {seq.filepath} already in filepathes')
     elif type == 'SOUND': #hasattr(seq, "sound"): #audio sequence
+        directory, basename = os.path.split(seq.sound.filepath)
+        
+        targetpath, audio_directories, vid_directories = get_audio_target_path(context, seq.sound.filepath,  audio_directories, vid_directories)
+        #audio_directories[directory] = targetpath
+        
         if seq.sound.filepath not in filepathes:
-            filepathes[seq.sound.filepath] = get_audio_target_path(context, seq.sound.filepath)
-    #elif type == 'IMAGE':
-    #    print(f'Found IMAGE {seq.name}----------------------------------------------------------------------------------')
-    #    directory = seq.directory
-    #    filename = seq.elements[0].filename
-    #    filepath = os.path.join(directory, filename)
-    #    if filepath not in filepathes:
-    #        n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
-    #        targetpath = get_imgseq_target_path(context, seq.elements[0].filename, directory) 
-    #        filepathes[filepath] = targetpath
+            filepathes[seq.sound.filepath] = targetpath
+        else:
+            print(f'found {seq.sound.filepath} already in filepathes') 
     elif type == 'IMGSEQ' or type == 'IMAGE': #  hasattr(seq, "directory"):#image sequence
         directory = seq.directory
-        n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
-        targetpath = get_imgseq_target_path(context, seq.elements[0].filename,n, directory)
-        imgseq_directories[directory] = targetpath
+        #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
+        targetpath, imgseq_directories = get_imgseq_target_path(context, seq.elements[0].filename, directory, imgseq_directories)
+        #imgseq_directories[directory] = targetpath
         for ele in seq.elements:
             filepath = os.path.join(directory, ele.filename) ####function naming confusing
-            print(f'Image sequence element {ele.filename} und resulating path {filepath}')
+            #print(f'Image sequence element {ele.filename} und resulating path {filepath}')
             if filepath not in filepathes:
-                filepathes[os.path.join(directory, ele.filename)] = os.path.join(imgseq_directories[directory], ele.filename)  ##get_imgseq_target_path(context, ele.filename, n, directory)
+                filepathes[os.path.join(directory, ele.filename)] = os.path.join(imgseq_directories[directory], ele.filename)  
 
-    return filepathes, imgseq_directories
+    return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories
 
 def collect_originals(context):
     arch_props = context.scene.vse_archiver
     
+    arch_props.target_folder = os.path.abspath(arch_props.target_folder)
+    print(arch_props.target_folder)
     ###make pathes absolut
     bpy.ops.file.make_paths_absolute()
 
@@ -185,54 +263,62 @@ def collect_originals(context):
     ###src target in dictionary
     filepathes = {}
     imgseq_directories = {}
+    vid_directories = {}
+    audio_directories = {}
+    font_directories = {}
+        
     for scene in bpy.data.scenes:
         sequences = scene.sequence_editor.sequences_all
         # collect filepath of linked vse elements and sort out doubles 
-        for seq in sequences: 
-            #print(seq.name)
-            filepathes, imgseq_directories = sequence_to_copy(context, seq, filepathes, imgseq_directories)
+        for seq in sequences[:]: 
+            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
 
     # check non-vse part for elements to copy 
     if arch_props.use_blend_data:
-        filepathes = collect_sounds(context, filepathes) ###sounds before movie important (and hacky); sounds look for movie seq with same filepath
-        filepathes = collect_moviclips(context, filepathes)
-        filepathes = collect_fonts(context, filepathes)
+        filepathes = collect_sounds(context, filepathes, audio_directories, vid_directories) 
+        filepathes = collect_moviclips(context, filepathes, vid_directories)
+        filepathes = collect_fonts(context, filepathes, font_directories)
         filepathes, imgseq_directories = collect_images(context, filepathes, imgseq_directories)
 
-    print(filepathes)
-
+    print(f'filepathes after collect:  ' )
+    #easy read print
+    for d in filepathes:
+        print(f' {d} : {filepathes[d]} ')
+    ###
+    
     for srcpath in filepathes.items():
-        
         targetpath, basename = split_filepath(srcpath[1])
         os.makedirs(targetpath, exist_ok=True)
         copy_file(srcpath[0], targetpath)
 
 
     if arch_props.rebuild:
-        build_blend_from_original(context, filepathes, imgseq_directories)
-        bpy.ops.file.make_paths_relative()
+        build_blend_from_original(context, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
+        
 
 
 
-def collect_moviclips(context, filepathes):
+def collect_moviclips(context, filepathes, vid_directories):
     data = bpy.data 
     for mc in data.movieclips:
         if mc.filepath  not in filepathes:
-            filepathes[mc.filepath] = get_video_target_path(context, mc.filepath)
+            directory, basename = os.path.split(mc.filepath)
+            filepathes[mc.filepath], vid_directories = get_video_target_path(context, mc.filepath, vid_directories)
     return filepathes
 
-def collect_sounds(context, filepathes):
+def collect_sounds(context, filepathes, audio_directories, vid_directories):
     data = bpy.data 
     for sound in data.sounds:
         if sound.filepath  not in filepathes:
-            filepathes[sound.filepath] = get_audio_target_path(context, sound.filepath)
+            filepathes[sound.filepath], audio_directories, vid_directories = get_audio_target_path(context, sound.filepath, audio_directories, vid_directories)
     return filepathes
 
-def collect_fonts(context, filepathes):
+def collect_fonts(context, filepathes, font_directories):
     data = bpy.data 
     for font in data.fonts:
         if font.filepath  not in filepathes:
-            filepathes[font.filepath] = get_font_target_path(context, font.filepath)
+            directory, basename = os.path.split(font.filepath)
+            filepathes[font.filepath], font_directories = get_font_target_path(context, font.filepath, font_directories)
     return filepathes
 
 def collect_images(context, filepathes, imgseq_directories):
@@ -241,15 +327,15 @@ def collect_images(context, filepathes, imgseq_directories):
         if img.type == 'IMAGE':
             if img.filepath  not in filepathes:
                 directory, basename = os.path.split(img.filepath)
-                n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
-                targetpath = get_imgseq_target_path(context, basename, n, directory)
+                #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
+                targetpath = get_imgseq_target_path(context, basename, directory)
                 imgseq_directories[directory] = targetpath
                 
                 if img.filepath not in filepathes:
-                        filepathes[img.filepath] = os.path.join(imgseq_directories[directory], basename)  ##get_imgseq_target_path(context, ele.filename, n, directory)
+                        filepathes[img.filepath] = os.path.join(imgseq_directories[directory], basename) 
                 
     return filepathes, imgseq_directories
-                #filepathes[img.filepath] = get_video_target_path(context, img.filepath)
+                
 
 
 
@@ -298,10 +384,21 @@ def save_blend_file(context):
     #save as blendfile to new folder
     bpy.ops.wm.save_as_mainfile(filepath=targetblendfilepath) 
 
+def get_rebuildPath_from_filepathes(context, orifilepath, filepathes):
+    for path in filepathes:
+        if path == orifilepath:
+            print(f'######## in get rebuild path found path {path} to return from filepathes {filepathes[path]}')
+            return filepathes[path]
+    #orifilepath, basename =  split_filepath(orifilepath)
+    print(f'#####COULDNT FIND orifilepath {orifilepath} in filepathes , send to basefolder insted ##########!!!!!!!!!!!!!! ')
+    #check in targetfolders because
+    for target in contentlist_from_dictionary(filepathes):
+        if target == orifilepath:
+            return orifilepath
+        
+    print('rebuild failed') ####################### prompt user
 
-
-
-def build_blend_from_original(context, filepathes, imgseq_directories):
+def build_blend_from_original(context, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories):
     arch_props = context.scene.vse_archiver
     #save as new blend in the folder 
     save_blend_file(context)
@@ -309,27 +406,23 @@ def build_blend_from_original(context, filepathes, imgseq_directories):
     sequences = context.scene.sequence_editor.sequences_all
     #pro sequence, strip filename from path, add filename to target folder path and replace filepath in sequence
     
-    print(f'image sequence directories are {filepathes}')
+    #print(f'image sequence directories are {filepathes}')
     for scene in bpy.data.scenes:
         sequences = scene.sequence_editor.sequences_all
         
         for seq in sequences: 
-            print(seq.name)
+            #print(seq.name)
             type = get_sequence_type(context, seq)
             if type == 'MOVIE': #hasattr(seq, "filepath"):
-                print(f'has filepath: {seq.name}')
-                seq.filepath = get_video_target_path(context, seq.filepath) 
+                #print(f'has filepath: {seq.name}')
+                #directory, basename = os.path.split(seq.filepath)
+                #seq.filepath, vid_directories = get_video_target_path(context, seq.filepath, vid_directories) 
+                seq.filepath = get_rebuildPath_from_filepathes(context, seq.filepath, filepathes)
             elif type == 'SOUND':# hasattr(seq, "sound"):
                 
-                seq.sound.filepath = get_audio_target_path(context, seq.sound.filepath) 
-                print(f'exchange audio reached seq {seq.sound.filepath} got from get_audio_target_path {get_audio_target_path(context, seq.sound.filepath)} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-            #elif type == 'IMAGE':
-            #    filepath = get_image_target_path(context, seq.elements[0].filename, seq.directory) 
-            #    directory, filename = os.path.split(filepath) 
-            #    seq.directory = directory
-                #seq.elements[0].filename = filename gar nicht nötig weil der name bleibt
                 
-            #image sequences
+                seq.sound.filepath = get_rebuildPath_from_filepathes(context, seq.sound.filepath, filepathes)   #get_audio_target_path(context, seq.sound.filepath,  n, directory, audio_directories, vid_directories) 
+                
                                 
             elif hasattr(seq, "directory"):####is image, not nice
                 directory = seq.directory
@@ -342,7 +435,11 @@ def build_blend_from_original(context, filepathes, imgseq_directories):
         remap_sounds(context, filepathes)
         remap_images(context, filepathes)
         remap_fonts(context, filepathes)
-
+        
+    bpy.ops.file.make_paths_relative()
+    save_blend_file(context)
+    
+    
 ##### snippets 
 ###main function to started by collect snippets operator 
 def collect_snippets(context): 
@@ -352,24 +449,25 @@ def collect_snippets(context):
             context.window.scene = scene
             filepathes ={}
             imgseq_directories = {}
+            vid_directories = {}
             sequences = get_visible_sequences(scene)#  scene.sequence_editor.sequences_all)
-            print(f'scene {scene.name} sequences found {sequences}')
+            #print(f'scene {scene.name} sequences found {sequences}')
             
-            filepathes, imgseq_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences)
+            filepathes, imgseq_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories)
                 
                 
             if context.scene.vse_archiver.rebuild:
                 build_blend_from_original(context, filepathes, imgseq_directories)
                 #save_blend_file(context)
                 
-def copy_render_decider(context, scene, filepathes, imgseq_directories, sequences):
+def copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories):
     for seq in sequences:
         answer = copy_or_render(context, scene, seq)
-        print(f'for seq {seq.name} got answer {answer}')
+        #print(f'for seq {seq.name} got answer {answer}')
         if answer == 'COPY':
             filepathes, imgseq_directories = sequence_to_copy(context, seq, filepathes, imgseq_directories)
         elif answer == 'RENDER':
-            render_sequence(context, seq, scene, False)
+            render_sequence(context, seq, scene, False, vid_directories)
         elif answer == 'META':
             filepathes, imgseq_directories = render_meta_snipets(context, scene, seq)
         elif answer == 'IGNORE':
@@ -395,7 +493,7 @@ def get_visible_sequences(scene):
 
 def set_sequences_visibility(vis_seq, scene):
     for seqvis in vis_seq:
-        print(f'visible sequences after render are {vis_seq}')
+        #print(f'visible sequences after render are {vis_seq}')
         for seq in scene.sequence_editor.sequences_all:
             if seq == seqvis:
                 seq.mute = False
@@ -405,10 +503,10 @@ def set_vis_for_render(seqs, scene):
         sequ.mute = True
     for seq in seqs:    
         seq.mute = False
-    print('necessary seq muted')
+    #print('necessary seq muted')
     #print(brak)
     
-def render_sequence(context, seq, scene, is_meta):
+def render_sequence(context, seq, scene, is_meta, vid_directories):
     arch_props = scene.vse_archiver
     #remember fade 
     #remember frame range 
@@ -441,9 +539,9 @@ def render_sequence(context, seq, scene, is_meta):
     
     # set new name and folder rendering
     #actually filepath, try how split reachts to a simple name
-    renderpath = get_video_target_path(context, seq.name) 
+    renderpath, vid_directories = get_video_target_path(context, seq.name, vid_directories) 
     renderpath = renderpath + '.mp4'
-    print(renderpath)
+    #print(renderpath)
     scene.render.filepath = renderpath
     context.scene.render.filepath = renderpath
     
@@ -476,26 +574,26 @@ def copy_or_render(context, scene, seq):
 
     type = get_sequence_type(context, seq)
     if type == 'IGNORE':
-        print(f'Ignored Sequence {seq.name} type {seq.type}')
+        #print(f'Ignored Sequence {seq.name} type {seq.type}')
         return 'IGNORE'
 
     
     if type == 'IMAGE':
-        print(f'found image {seq.name} render_image {arch_props.render_image}')
+        #print(f'found image {seq.name} render_image {arch_props.render_image}')
         if arch_props.render_image:
             return 'RENDER'
         else:
             return 'COPY'
     
     if type == 'IMGSEQ':
-        print(f'found Imgseq {seq.name} render_imageseq {arch_props.render_imagesequence}')
+        #print(f'found Imgseq {seq.name} render_imageseq {arch_props.render_imagesequence}')
         if arch_props.render_imagesequence:
             return 'RENDER'
         else:
             return 'COPY'        
 
     if type == 'SCENE':
-        print(f'found scene {seq.name} render_scenestrip {arch_props.render_scenestrip}')
+        #print(f'found scene {seq.name} render_scenestrip {arch_props.render_scenestrip}')
         if arch_props.render_scenestrip:
             return 'RENDER'
         else:
@@ -540,7 +638,7 @@ def get_sequence_type(context, seq):
     
     
     
-def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories):
+def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories):
     
     #get metastrip elements 
     elements = seq.sequences
@@ -551,7 +649,7 @@ def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories):
     
     # should the elements be rendered individually? 
     if is_render_elements(seq):
-        filepathes, imgseq_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences) 
+        filepathes, imgseq_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories) 
     #   yes: send individual elements to be rendered render_sequence(context, seq, scene, is_meta) 
     #   NO: send this meta strip to render_sequence(context, seq, scene, is_meta)
     else: 

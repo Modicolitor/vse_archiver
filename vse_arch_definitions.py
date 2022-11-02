@@ -5,9 +5,9 @@ def is_audio(filepath):
     filename, extension =os.path.splitext(filepath)
     if len(extension) != 0:
         extension =   extension[1:]
-    print(f'extension {extension} of filepath {filepath}')
+    #print(f'extension {extension} of filepath {filepath}')
     audiotypes = ['AAC','aac', 'AC3', 'ac3', 'FLAC','flac', 'MP2', 'mp2', 'MP3', 'mp3', 'Opus', 'opus', 'OPUS', 'PCM', 'pcm', 'AIF', 'aif', 'Aac', 'Ac3', 'Flac', 'Mp2', 'Mp3', 'Opus', 'Pcm', 'Aif', 'wav', 'WAV', 'Wav'] #can be video as well 'OGG', 'ogg' added wav
-    print(f'found to be audio {extension in audiotypes} ')
+    #print(f'found to be audio {extension in audiotypes} ')
     return extension in audiotypes
         
         
