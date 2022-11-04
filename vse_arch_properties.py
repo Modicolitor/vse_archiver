@@ -39,6 +39,9 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
     
     target_font_folder: bpy.props.StringProperty(
         name="Fonts Folder Name", default = 'Fonts')
+    
+    target_snippet_folder: bpy.props.StringProperty(
+        name="Snippets Folder Name", default = 'Snippets')
 
     mode: bpy.props.EnumProperty(
         name='',  # SingleCoupltypes
