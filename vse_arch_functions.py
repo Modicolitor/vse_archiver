@@ -491,7 +491,7 @@ def copy_render_decider(context, scene, filepathes, imgseq_directories, sequence
         elif answer == 'RENDER':
             filepathes, vid_directories = render_sequence(context, seq, scene, False, filepathes, vid_directories)
         elif answer == 'META':
-            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = render_meta_snipets(context, scene, seq, imgseq_directories, vid_directories, audio_directories, font_directories)
+            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
         elif answer == 'IGNORE':
             print(f'ignored sequence {seq.name}')
         else:
@@ -521,7 +521,43 @@ def set_sequences_visibility(vis_seq, scene):
             if seq == seqvis:
                 seq.mute = False
 
+def get_effectstrip_cascade(seq, seqs):
+    print(f'seq {seq} at start of effecstrip cascade seqs {seqs}')
+    if hasattr(seq, 'input_1'):
+        if seq.input_1 != None:
+            #ist in input der Renderrelevanter strip
+            if seq.input_1 in seqs:
+                if seq not in seqs:
+                    seqs.append(seq)
+            else:
+                ### wenn nicht direkt rendererelevant, 
+                # hat es dann vielleicht effekt strips untersich die gerendert werd
+                seqs = get_effectstrip_cascade(seq.input_1, seqs)
+            
+    
+    return seqs
+
 def set_vis_for_render(seqs, scene):
+    #adjust for metastrip
+    for m_seq in seqs:
+        print(f'mseqs type {m_seq.type}')
+        if m_seq.type == 'META':
+            seqs.extend(m_seq.sequences)
+            print(f'after metastrip in vis seqs {seqs} m_seq {m_seq.sequences}')
+    
+    
+    #find effect strips 
+    for a_seq in scene.sequence_editor.sequences_all:
+        seqs = get_effectstrip_cascade(a_seq, seqs)
+    
+    #parent case sequence in meta --> vis meta true
+    for p_seq in seqs:
+        parent = p_seq.parent_meta()
+        if parent != None: 
+            seqs.append(parent)
+    print(f'seqs after effectstrip cascade {seqs}')
+            
+    #####don't set vis false when its a speed track or other effect strip 
     for sequ in scene.sequence_editor.sequences_all:
         sequ.mute = True
     for seq in seqs:    
@@ -544,10 +580,10 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     scene.frame_start = render_start
     scene.frame_end = render_end
     # copy list of visible sequences 
-    vis_seqs = get_visible_sequences(scene)
+    ori_vis_seqs = get_visible_sequences(scene)
     
     
-    #hide_all sequences but the active 
+    #hide_all sequences but the active and effect
     if not is_meta:
         set_vis_for_render([seq], scene)
     
@@ -573,7 +609,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     context.scene.render.filepath = renderpath
     
     #if seq.type == "META":
-    #    print(bb)
+    #print(bb)
     # render sequence 
     bpy.ops.render.render(animation=True)
 
@@ -583,7 +619,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     scene.frame_end = init_end
     
     if not is_meta:
-        set_sequences_visibility(vis_seqs, scene)
+        set_sequences_visibility(ori_vis_seqs, scene)
     
     if arch_props.rebuild:
         seq = replace_sequence_w_rendered(scene, seq, renderpath)
@@ -596,11 +632,22 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     return filepathes, vid_directories
         
 def replace_sequence_w_rendered(scene, seq, newfilepath):
+    parent = seq.parent_meta()
+    if parent == None: 
+        sequences = scene.sequence_editor.sequences    
+    else: 
+        sequences = parent.sequences
     ##new sequence 
-    newseq = scene.sequence_editor.sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
-    for seq_cont in scene.sequence_editor.sequences:
+    
+    
+    newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+    
+    for seq_cont in sequences:
         if seq == seq_cont:
-            scene.sequence_editor.sequences.remove(seq)
+            sequences.remove(seq)
+
+    #seq in metastrip metastrip case
+        
     return newseq
    
 
@@ -673,25 +720,34 @@ def get_sequence_type(context, seq):
     
     
     
-def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories):
+def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories):
     
-    #get metastrip elements 
-    elements = seq.sequences
+   
     
-    vis_seqs = get_visible_sequences(scene)
-    #set visibility for elements (careful will be set in render_sequences again)
-    set_vis_for_render (elements, scene)
+    ##for rendering only the inside stuff 
+    
     
     # should the elements be rendered individually? 
-    if is_render_elements(seq):
-        filepathes, imgseq_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories) 
+    if is_render_elements(context, scene, seq):
+        filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, seq.sequences, vid_directories, audio_directories, font_directories) 
     #   yes: send individual elements to be rendered render_sequence(context, seq, scene, is_meta) 
     #   NO: send this meta strip to render_sequence(context, seq, scene, is_meta)
     else: 
-        render_sequence(context, seq, scene, True)
+        #get metastrip elements 
+        elements =[seq]
+        for subseq in seq.sequences:
+            if subseq not in elements:
+                elements.append(subseq)
+        #elements.append(seq)
         
-    set_sequences_visibility(vis_seqs,scene)
-    return filepathes, imgseq_directories
+        vis_seqs = get_visible_sequences(scene)
+        #set visibility for elements (careful will be set in render_sequences again)
+        set_vis_for_render (elements, scene)
+        
+        render_sequence(context, seq, scene, True, filepathes, vid_directories)
+        
+        set_sequences_visibility(vis_seqs,scene)
+    return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories
 
 
 def is_render_elements(context, scene, seq): 
