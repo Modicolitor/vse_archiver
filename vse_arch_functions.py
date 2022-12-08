@@ -470,11 +470,13 @@ def collect_snippets(context):
             context.window.scene = scene
             
             sequences = get_visible_sequences(scene)#  scene.sequence_editor.sequences_all)
+            all_vis_seqs = get_all_visible_sequences(scene)
             #print(f'scene {scene.name} sequences found {sequences}')
             
-            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories)
+            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories)
             print(f'seems to be done with all sequences of {scene}')   
-    
+            all_vis_seqs.append(new_seqs)
+            set_sequences_visibility(all_vis_seqs, scene)
     
     copy_files(filepathes)
                 
@@ -483,22 +485,25 @@ def collect_snippets(context):
         #save_blend_file(context)
                 
 def copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories):
+    new_seqs=[]
     for seq in sequences[:]:
         answer = copy_or_render(context, scene, seq)
         print(f'for seq {seq.name} got answer {answer}')
         if answer == 'COPY':
             filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
         elif answer == 'RENDER':
-            filepathes, vid_directories = render_sequence(context, seq, scene, False, filepathes, vid_directories)
+            filepathes, vid_directories, new_seq = render_sequence(context, seq, scene, False, filepathes, vid_directories)
+            new_seqs.append(new_seq)
         elif answer == 'META':
-            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
+            filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seq = render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
+            new_seqs.append(new_seq)
         elif answer == 'IGNORE':
             print(f'ignored sequence {seq.name}')
         else:
             print(f'weird answer {answer}')
             
-    
-    return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories
+    print(f'after copy_render_decider new seqs {new_seqs}')
+    return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs
                 
             
 
@@ -509,20 +514,32 @@ def copy_render_decider(context, scene, filepathes, imgseq_directories, sequence
     
 def get_visible_sequences(scene):
     vis = []
-    for seq in scene.sequence_editor.sequences: #_all
+    ###used to identify start condition, don't use _all
+    for seq in scene.sequence_editor.sequences:
         if not seq.mute:
             vis.append(seq)
     return vis
 
-def set_sequences_visibility(vis_seq, scene):
-    for seqvis in vis_seq:
-        #print(f'visible sequences after render are {vis_seq}')
+def get_all_visible_sequences(scene):
+    vis = []
+    ###used to identify start condition, don't use _all
+    for seq in scene.sequence_editor.sequences_all:
+        if not seq.mute:
+            vis.append(seq)
+    return vis
+
+def set_sequences_visibility(vis_seqs, scene):
+    for seqvis in vis_seqs:
+        print(f'visible sequences after render are {vis_seqs}')
         for seq in scene.sequence_editor.sequences_all:
             if seq == seqvis:
                 seq.mute = False
+                break
+            #else:    
+             #   print(f'*********************found none fitting seq  in seq_all , {seqvis}')
 
 def get_effectstrip_cascade(seq, seqs):
-    print(f'seq {seq} at start of effecstrip cascade seqs {seqs}')
+    #print(f'seq {seq} at start of effecstrip cascade seqs {seqs}')
     if hasattr(seq, 'input_1'):
         if seq.input_1 != None:
             #ist in input der Renderrelevanter strip
@@ -540,7 +557,7 @@ def get_effectstrip_cascade(seq, seqs):
 def set_vis_for_render(seqs, scene):
     #adjust for metastrip
     for m_seq in seqs:
-        print(f'mseqs type {m_seq.type}')
+        #print(f'mseqs type {m_seq.type}')
         if m_seq.type == 'META':
             seqs.extend(m_seq.sequences)
             print(f'after metastrip in vis seqs {seqs} m_seq {m_seq.sequences}')
@@ -555,7 +572,7 @@ def set_vis_for_render(seqs, scene):
         parent = p_seq.parent_meta()
         if parent != None: 
             seqs.append(parent)
-    print(f'seqs after effectstrip cascade {seqs}')
+    #print(f'seqs after effectstrip cascade {seqs}')
             
     #####don't set vis false when its a speed track or other effect strip 
     for sequ in scene.sequence_editor.sequences_all:
@@ -622,14 +639,14 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
         set_sequences_visibility(ori_vis_seqs, scene)
     
     if arch_props.rebuild:
-        seq = replace_sequence_w_rendered(scene, seq, renderpath)
+        new_seq = replace_sequence_w_rendered(scene, seq, renderpath)
     
     
     ##filepathes only meant for copying original files
     target_directory, basename = os.path.split(renderpath)
     filepathes[os.path.join(target_directory, basename)] = os.path.join(target_directory, basename)
-    print(f'rendered {seq.name} and saved oripath {FakeOrifilepath}  render path {renderpath}')
-    return filepathes, vid_directories
+    print(f'rendered {new_seq.name} and saved oripath {FakeOrifilepath}  render path {renderpath}')
+    return filepathes, vid_directories, new_seq
         
 def replace_sequence_w_rendered(scene, seq, newfilepath):
     parent = seq.parent_meta()
@@ -721,15 +738,15 @@ def get_sequence_type(context, seq):
     
     
 def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories):
-    
-   
-    
+    new_seqs = []
     ##for rendering only the inside stuff 
-    
-    
+    print(f'For MEtastrip {seq.name} in render meta snippets is_render_elements {is_render_elements(context, scene, seq)}')
+    vis_seqs = get_all_visible_sequences(scene)
     # should the elements be rendered individually? 
     if is_render_elements(context, scene, seq):
-        filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = copy_render_decider(context, scene, filepathes, imgseq_directories, seq.sequences, vid_directories, audio_directories, font_directories) 
+        filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs = copy_render_decider(context, scene, filepathes, imgseq_directories, seq.sequences, vid_directories, audio_directories, font_directories) 
+        set_sequences_visibility(vis_seqs,scene)
+        vis_seqs.extend(new_seqs)
     #   yes: send individual elements to be rendered render_sequence(context, seq, scene, is_meta) 
     #   NO: send this meta strip to render_sequence(context, seq, scene, is_meta)
     else: 
@@ -740,21 +757,25 @@ def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid
                 elements.append(subseq)
         #elements.append(seq)
         
-        vis_seqs = get_visible_sequences(scene)
+        #vis_seqs = get_visible_sequences(scene)
         #set visibility for elements (careful will be set in render_sequences again)
         set_vis_for_render (elements, scene)
         
-        render_sequence(context, seq, scene, True, filepathes, vid_directories)
-        
-        set_sequences_visibility(vis_seqs,scene)
-    return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories
+        filepathes, vid_directories, new_seq = render_sequence(context, seq, scene, True, filepathes, vid_directories)
+        vis_seqs.append(new_seq)
+        new_seqs.append(new_seq)
+        print(f'vis_seqs after meta strip render {vis_seqs}')
+    set_sequences_visibility(vis_seqs,scene)
+    #print(bb)
+    return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs
 
 
 def is_render_elements(context, scene, seq): 
     arch_metastrips = scene.vse_archiver.metastrips
     for ele in arch_metastrips:
-            if ele.name == seq.name:
-                return ele.render_inside
+        if ele.name == seq.name:
+            return ele.render_inside
+    print('couldnt finds render element')
 
 
 def reset_metastrips(context):
@@ -768,7 +789,8 @@ def reset_metastrips(context):
 
 ####adds metastrips that are not present yet in the list ; renaming strips,  after making   
 def update_metastrips(context):
-    print('in updates ')
+    print('in updates ') 
+    
     
     ######################PROBLEM In verschiedenen Scenen können Strips den gleich namen haben, nur nicht innerhalb der scene, aber es ist ja eh per scene gespeichert 
     for sc in bpy.data.scenes:
@@ -776,7 +798,7 @@ def update_metastrips(context):
         arch_metastrips = sc.vse_archiver.metastrips
         
         for seq in sequences:
-            print(f'seq {seq.name} ')
+            #print(f'seq {seq.name} ')
             if seq.type == 'META':
                 if seq.name not in arch_metastrips:
                     print(f'ele {seq.name} ')
