@@ -463,19 +463,26 @@ def collect_snippets(context):
     font_directories = {}
     
     bpy.ops.file.make_paths_absolute()
+    
+    homogenous_addon_settings_over_scene(context)
             
     #  gehe durch sequences
     for scene in bpy.data.scenes:
         if hasattr(scene, 'vse_archiver'):
             context.window.scene = scene
             
+            
+            
             sequences = get_visible_sequences(scene)#  scene.sequence_editor.sequences_all)
+            #in cases user is in metastrip
+            find_toplevel(context, scene, context.sequences)
+            #print(bb)
             all_vis_seqs = get_all_visible_sequences(scene)
             #print(f'scene {scene.name} sequences found {sequences}')
             
             filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs = copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories)
             print(f'seems to be done with all sequences of {scene}')   
-            all_vis_seqs.append(new_seqs)
+            all_vis_seqs.extend(new_seqs)
             set_sequences_visibility(all_vis_seqs, scene)
     
     copy_files(filepathes)
@@ -483,6 +490,30 @@ def collect_snippets(context):
     if context.scene.vse_archiver.rebuild:
         build_blend_from_original(context, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
         #save_blend_file(context)
+            
+def homogenous_addon_settings_over_scene(context):
+    
+    
+    for sc in bpy.data.scenes:
+        va = sc.vse_archiver
+        va.rebuild = context.scene.vse_archiver.rebuild
+        va.remove_fade = context.scene.vse_archiver.remove_fade
+        va.render_audio = context.scene.vse_archiver.render_audio
+        va.render_image = context.scene.vse_archiver.render_image
+        va.render_imagesequence = context.scene.vse_archiver.render_imagesequence
+        va.render_metastrip = context.scene.vse_archiver.render_metastrip
+        va.render_movie = context.scene.vse_archiver.render_movie
+        va.render_scenestrip = context.scene.vse_archiver.render_scenestrip
+        
+        va.target_audio_folder = context.scene.vse_archiver.target_audio_folder
+        va.target_folder = context.scene.vse_archiver.target_folder
+        va.target_font_folder = context.scene.vse_archiver.target_font_folder
+        va.target_image_folder = context.scene.vse_archiver.target_image_folder
+        va.target_imgseq_folder = context.scene.vse_archiver.target_imgseq_folder
+        va.target_snippet_folder = context.scene.vse_archiver.target_snippet_folder
+        va.target_video_folder = context.scene.vse_archiver.target_video_folder
+        
+        va.use_blend_data = context.scene.vse_archiver.use_blend_data
                 
 def copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories):
     new_seqs=[]
@@ -505,12 +536,19 @@ def copy_render_decider(context, scene, filepathes, imgseq_directories, sequence
     print(f'after copy_render_decider new seqs {new_seqs}')
     return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs
                 
-            
+#supposed to toggle meta strips to the toplevel, but bugged when sequences kein meta_parent()            
+def find_toplevel(context, scene, sequences):
+    print(sequences)
+    if sequences[0].parent_meta() != None:
+        #deselect all 
+        for s in scene.sequence_editor.sequences_all:
+            s.select = False 
+        #toogle 
+        bpy.ops.sequencer.meta_toggle()
 
-    # entscheide render or collect
-    # wenn render send to render part 
-        
-    # wenn collect send to collect system 
+        #test again
+        sequences = context.sequences #get_visible_sequences(scene)
+        find_toplevel(context, scene, sequences)
     
 def get_visible_sequences(scene):
     vis = []
@@ -639,7 +677,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
         set_sequences_visibility(ori_vis_seqs, scene)
     
     if arch_props.rebuild:
-        new_seq = replace_sequence_w_rendered(scene, seq, renderpath)
+        new_seq = replace_sequence_w_rendered(context, scene, seq, renderpath)
     
     
     ##filepathes only meant for copying original files
@@ -648,7 +686,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     print(f'rendered {new_seq.name} and saved oripath {FakeOrifilepath}  render path {renderpath}')
     return filepathes, vid_directories, new_seq
         
-def replace_sequence_w_rendered(scene, seq, newfilepath):
+def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     parent = seq.parent_meta()
     if parent == None: 
         sequences = scene.sequence_editor.sequences    
@@ -656,14 +694,16 @@ def replace_sequence_w_rendered(scene, seq, newfilepath):
         sequences = parent.sequences
     ##new sequence 
     
-    
-    newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+    if get_sequence_type(context, seq) != 'SOUND':
+        newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+    else:
+        newseq = sequences.new_sound(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
     
     for seq_cont in sequences:
         if seq == seq_cont:
             sequences.remove(seq)
 
-    #seq in metastrip metastrip case
+    
         
     return newseq
    

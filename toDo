@@ -37,7 +37,7 @@ Copy original:
     [] archiving to the same File/Folder
 
 
-[] rendered snipptes inside a meta strip are not set visible
+[] crash when inside a metastrip which is replaced
     
 what else could be missing: 
 - caches? 
