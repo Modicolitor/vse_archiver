@@ -18,9 +18,6 @@ Rebuild:
 
 
 
-einschränkungen:
-- only the active scene is saved
-
 Einschränkungen 
 
 restricted to mp4 
@@ -30,14 +27,19 @@ what about effects strips getting removed when changing the
 Bugs: 
 Copy original: 
     [+] Sounds which are connected to videos should be reconnected to the video folder and not audio
-    [ ] some images are relinked to the false Directory folder but files are copied to the right folder getting same key
-    [] fonts not supported
+    
+    #[?] fonts not supported
+    
+    [] remove fade for render and reapply after render (mainstrip, but also effect strips)
+    [] use scene render settings (also for the other scenes)
+    
+    [] individual sequence list where you can per element decide whether copy or render
+    [] ui toggle 
+    [] ui active and general fiels 
 
-    []  different videos with the same name in different folders are getting copied into one folder propably overwriten
-    [] archiving to the same File/Folder
+    [] absolut path from relative path for archiv folder
 
 
-[] crash when inside a metastrip which is replaced
     
 what else could be missing: 
 - caches? 
