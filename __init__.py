@@ -32,6 +32,24 @@ from .vse_arch_operators import PP_OT_Collect_VSE_Original
 from .vse_arch_operators import PP_OT_Render_VSE_Snippets
 from .vse_arch_operators import PP_OT_Initialize_Archiver
 from .vse_arch_operators import PP_OT_Arch_ResetMetastrip, PP_OT_Arch_UpdateMetastrip
+from .vse_arch_operators import PP_OT_Arch_RenderSeq_On
+from .vse_arch_operators import PP_OT_Arch_RenderSeq_Off
+from .vse_arch_operators import PP_OT_Arch_RenderMeta_On
+from .vse_arch_operators import PP_OT_Arch_RenderMeta_Off
+from .vse_arch_operators import PP_OT_Arch_RenderMovie_On
+from .vse_arch_operators import PP_OT_Arch_RenderMovie_Off
+from .vse_arch_operators import PP_OT_Arch_RenderGMeta_On
+from .vse_arch_operators import PP_OT_Arch_RenderGMeta_Off
+from .vse_arch_operators import PP_OT_Arch_RenderSound_On
+from .vse_arch_operators import PP_OT_Arch_RenderSound_Off
+from .vse_arch_operators import PP_OT_Arch_RenderScene_On
+from .vse_arch_operators import PP_OT_Arch_RenderScene_Off
+from .vse_arch_operators import PP_OT_Arch_RenderImgSeq_On
+from .vse_arch_operators import PP_OT_Arch_RenderImgSeq_Off
+from .vse_arch_operators import PP_OT_Arch_RenderImage_On
+from .vse_arch_operators import PP_OT_Arch_RenderImage_Off
+
+
 from .vse_arch_ui import PP_PT_VSEArchiver_Menu
 from .vse_arch_properties import VSE_Archiver_MetaStrip
 from .vse_arch_properties import VSE_Archiver_SequenceStrip
@@ -60,7 +78,22 @@ classes = (    PP_OT_Collect_VSE_Original,
     BA_OT_Blend_Network,
     PP_OT_Arch_ResetMetastrip, 
     PP_OT_Arch_UpdateMetastrip,
-    
+    PP_OT_Arch_RenderSeq_Off,
+    PP_OT_Arch_RenderSeq_On,
+    PP_OT_Arch_RenderMeta_On,
+    PP_OT_Arch_RenderMeta_Off,
+    PP_OT_Arch_RenderMovie_On,
+    PP_OT_Arch_RenderMovie_Off,
+    PP_OT_Arch_RenderGMeta_On,
+    PP_OT_Arch_RenderGMeta_Off,
+    PP_OT_Arch_RenderSound_On,
+    PP_OT_Arch_RenderSound_Off,
+    PP_OT_Arch_RenderScene_On,
+    PP_OT_Arch_RenderScene_Off,
+    PP_OT_Arch_RenderImgSeq_On,
+    PP_OT_Arch_RenderImgSeq_Off,
+    PP_OT_Arch_RenderImage_On,
+    PP_OT_Arch_RenderImage_Off
        )
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)

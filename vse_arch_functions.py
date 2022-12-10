@@ -12,6 +12,8 @@ def copy_file(src, dst):
 def print_list(list):
     for n,l in enumerate(list):
         print(f'{n}     {l}')
+        
+
 
 def get_video_target_path(context, filepath, vid_directories):
     #print(f'In get video path filepath {filepath} directory {directory} vid_directories {vid_directories} ')
@@ -710,7 +712,17 @@ def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     
         
     return newseq
-   
+
+def get_seqdata_from_seq(context, seq):
+    
+    for ele in context.scene.vse_archiver.sequences:
+        if ele.name == seq.name:
+            return ele
+        
+def get_metadata_from_seq(context, seq):
+    for ele in context.scene.vse_archiver.metastrips:
+        if ele.name == seq.name:
+            return ele
 
 def copy_or_render(context, scene, seq):
     arch_props = scene.vse_archiver 
@@ -762,6 +774,11 @@ def get_seq_render_tag(scene, seq):
     for s in scene.vse_archiver.sequences:
         if s.name == seq.name:
             return s.pls_render
+        
+        
+    for s in scene.vse_archiver.metastrips:
+        if s.name == seq.name:
+            return s.render_inside
     
     
 
@@ -833,8 +850,8 @@ def reset_metastrips(context):
         #sequences = sc.sequence_editor.sequences_all
         arch_metastrips = sc.vse_archiver.metastrips
         
-        for n,ele in enumerate(arch_metastrips):
-            arch_metastrips.remove(n)
+        
+        arch_metastrips.clear()
     update_metastrips(context)
 
 ####adds metastrips that are not present yet in the list ; renaming strips,  after making   
@@ -855,18 +872,16 @@ def update_metastrips(context):
                     ele.name = seq.name 
     
         ####looks for old metastrip data with no counter part in the current state  
-        for n,ele in enumerate(arch_metastrips):
+        for n,ele in enumerate(arch_metastrips[:]):
             if ele.name not in sequences:
                 arch_metastrips.remove(n)
                
                
 def reset_sequences_data(context):
     for sc in bpy.data.scenes:
-        #sequences = sc.sequence_editor.sequences_all
-        arch_sequences = sc.vse_archiver.sequences
-        
-        for n,ele in enumerate(arch_sequences):
-            arch_sequences.remove(n)
+        vse_archiver = sc.vse_archiver
+        vse_archiver.sequences.clear()
+    
     update_sequences_data(context)
 
 ####adds metastrips that are not present yet in the list ; renaming strips,  after making   
@@ -901,6 +916,6 @@ def update_sequences_data(context):
                 
     
         ####looks for old metastrip data with no counter part in the current state  
-        for n,ele in enumerate(arch_sequences):
+        for n,ele in enumerate(arch_sequences[:]):
             if ele.name not in sequences:
                 arch_sequences.remove(n)

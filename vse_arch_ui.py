@@ -1,5 +1,5 @@
 import bpy
-from .vse_arch_functions import get_sequence_type, print_list
+from .vse_arch_functions import get_sequence_type, print_list, get_seq_render_tag
 
 
 
@@ -39,8 +39,8 @@ def has_equal_sequences(context):
         arch_sequences = sc.vse_archiver.sequences
         arch_count += len(arch_sequences)
         
-    print(f'sequence count is {c} and archiver metacount {arch_count}')
-    print_list(sc.vse_archiver.sequences)
+    #print(f'sequence count is {c} and archiver metacount {arch_count}')
+    #print_list(sc.vse_archiver.sequences)
     
     return c == arch_count
 
@@ -91,23 +91,148 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 subcol.operator("varch.updmeta", text="Update Sequence Data", icon="FILE_REFRESH")
                 subcol.operator("varch.resetmeta", text="Reset Sequence Data", icon="TRACKING_CLEAR_BACKWARDS")
                 
-                ###active data set
-                active = context.active_sequence_strip
-                if active != None:
-                    if active.name in arch_props.metastrips:
-                        subcol.prop(arch_props.metastrips[active.name], "render_inside")
-                    if active.name in arch_props.sequences:
-                        if active.name not in arch_props.metastrips:
-                            subcol.prop(arch_props.sequences[active.name], "pls_render", text='Render Sequence')
-                    
                 
-                box = col.box()
+                box = subcol.box()
+                box.alignment = 'RIGHT'
+                
+                '''box.label(text='General Settings')
                 box.prop(arch_props, "render_image")
                 box.prop(arch_props, "render_imagesequence")
                 box.prop(arch_props, "render_scenestrip")
                 box.prop(arch_props, "render_sound")
                 box.prop(arch_props, "render_metastrip")
-                box.prop(arch_props, "render_movie")
+                box.prop(arch_props, "render_movie")'''
+                
+                row = box.row(heading='Images')
+                row = row.split(factor=0.3)
+                row.label(text='Images ')#'              '
+                if arch_props.render_image:
+                            
+                    row.operator("varch.imgoff",
+                                icon="UNPINNED", text="Copy", depress=False)
+                    row.operator("varch.imgoff",
+                                icon="PINNED", text="Render", depress=True)
+                else:
+                    row.operator("varch.imgon",
+                                icon="UNPINNED", text="Copy", depress=True)
+                    row.operator("varch.imgoff",
+                                icon="PINNED", text="Render", depress=False)
+                
+                row = box.row()
+                row.label(text='Imagesequences')
+                if arch_props.render_imagesequence:
+                            
+                    row.operator("varch.imgseqoff",
+                                icon="UNPINNED", text="Copy", depress=False)
+                    row.operator("varch.imgseqon",
+                                icon="PINNED", text="Render", depress=True)
+                else:
+                    row.operator("varch.imgseqoff",
+                                icon="UNPINNED", text="Copy", depress=True)
+                    row.operator("varch.imgseqon",
+                                icon="PINNED", text="Render", depress=False)
+                
+                row = box.row()
+                row.label(text='Scenes                ')
+                if arch_props.render_scenestrip:
+                            
+                    row.operator("varch.scnoff",
+                                icon="UNPINNED", text="Copy", depress=False)
+                    row.operator("varch.scnon",
+                                icon="PINNED", text="Render", depress=True)
+                else:
+                    row.operator("varch.scnoff",
+                                icon="UNPINNED", text="Copy", depress=True)
+                    row.operator("varch.scnon",
+                                icon="PINNED", text="Render", depress=False)
+                    
+                    
+                row = box.row()
+                row.label(text='Audio                  ')
+                if arch_props.render_sound:
+                            
+                    row.operator("varch.soundoff",
+                                icon="UNPINNED", text="Copy", depress=False)
+                    row.operator("varch.soundon",
+                                icon="PINNED", text="Render", depress=True)
+                else:
+                    row.operator("varch.soundoff",
+                                icon="UNPINNED", text="Copy", depress=True)
+                    row.operator("varch.soundon",
+                                icon="PINNED", text="Render", depress=False)
+                
+                row = box.row()
+                row.label(text='Metastrips           ')
+                if arch_props.render_metastrip:
+                            
+                    row.operator("varch.gmetaoff",
+                                icon="UNPINNED", text="Copy", depress=False)
+                    row.operator("varch.gmetaon",
+                                icon="PINNED", text="Render", depress=True)
+                else:
+                    row.operator("varch.gmetaoff",
+                                icon="UNPINNED", text="Copy", depress=True)
+                    row.operator("varch.gmetaon",
+                                icon="PINNED", text="Render", depress=False)
+                    
+                    
+                row = box.row()
+                row.label(text='Movie                  ')
+                if arch_props.render_movie:
+                            
+                    row.operator("varch.movieoff",
+                                icon="UNPINNED", text="Copy", depress=False)
+                    row.operator("varch.movieon",
+                                icon="PINNED", text="Render", depress=True)
+                else:
+                    row.operator("varch.movieoff",
+                                icon="UNPINNED", text="Copy", depress=True)
+                    row.operator("varch.movieon",
+                                icon="PINNED", text="Render", depress=False)    
+                
+                
+                box = col.box() 
+                box.label(text='Individual Settings')
+                row = box.row()
+                ###active data set
+                
+                active = context.active_sequence_strip
+                if active != None:
+                    if active.name in arch_props.metastrips:
+                        #subcol.prop(arch_props.metastrips[active.name], "render_inside")
+                        if get_seq_render_tag(context.scene, active):
+                                row.operator("varch.metoff",
+                                            icon="UNPINNED", text="Render", depress=False)
+                                row.operator("varch.meton",
+                                            icon="PINNED", text="Use Inside", depress=True)
+                                
+                        else:
+                            row.operator("varch.metoff",
+                                        icon="UNPINNED", text="Render", depress=True)
+                            row.operator("varch.meton",
+                                        icon="PINNED", text="Use Inside", depress=False)
+                    
+                    if active.name in arch_props.sequences:
+                        #if active.name not in arch_props.metastrips:
+                            
+                        #subcol.prop(arch_props.sequences[active.name], "pls_render", text='Render Sequence')
+                        
+                        if get_seq_render_tag(context.scene, active):
+                            
+                            row.operator("varch.seqoff",
+                                        icon="UNPINNED", text="Copy", depress=False)
+                            row.operator("varch.seqon",
+                                        icon="PINNED", text="Render", depress=True)
+                        else:
+                            row.operator("varch.seqoff",
+                                        icon="UNPINNED", text="Copy", depress=True)
+                            row.operator("varch.seqon",
+                                        icon="PINNED", text="Render", depress=False)
+                            
+                                
+                            
+                
+                
 
 
         else:
