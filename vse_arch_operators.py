@@ -1,7 +1,7 @@
 import bpy 
 
 from .vse_arch_properties import VSE_Archiver_PropGroup
-from .vse_arch_functions import collect_originals, collect_snippets, update_metastrips, reset_metastrips
+from .vse_arch_functions import collect_originals, collect_snippets, update_metastrips, reset_metastrips, update_sequences_data, reset_sequences_data
 
 class PP_OT_Initialize_Archiver(bpy.types.Operator):
     '''Archiv Project with the chosen Setting'''
@@ -18,7 +18,8 @@ class PP_OT_Initialize_Archiver(bpy.types.Operator):
     def execute(self, context):
         bpy.types.Scene.vse_archiver = bpy.props.PointerProperty(type=VSE_Archiver_PropGroup)
         #bpy.types.Sequences.render_to_archive = bpy.props.BoolProperty(name='RenderThisStrip', default=False)
-        reset_metastrips(context)
+        update_metastrips(context)
+        update_sequences_data(context)
         return{"FINISHED"}
 
 class PP_OT_Collect_VSE_Original(bpy.types.Operator):
@@ -86,6 +87,7 @@ class PP_OT_Arch_UpdateMetastrip(bpy.types.Operator):
         #print('start operator')
         #collect_snippets(context)
         update_metastrips(context)
+        update_sequences_data(context)
         #self.report(
         #        {'INFO'}, "You are in the new archived blend file, now!!!")
         return{"FINISHED"}
@@ -110,6 +112,7 @@ class PP_OT_Arch_ResetMetastrip(bpy.types.Operator):
         #print('start operator')
         #collect_snippets(context)
         reset_metastrips(context)
+        reset_sequences_data(context)
         #self.report(
         #        {'INFO'}, "You are in the new archived blend file, now!!!")
         return{"FINISHED"}

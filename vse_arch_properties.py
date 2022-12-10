@@ -1,11 +1,19 @@
 import bpy
 #from bpy.types import Scene, Image, Object
+
+class VSE_Archiver_SequenceStrip(bpy.types.PropertyGroup):
+    name:bpy.props.StringProperty(
+        name="Video Folder Name", default = 'Video')
+    pls_render:bpy.props.BoolProperty(
+        name="Render Sequence", default=False)
+    
 class VSE_Archiver_MetaStrip(bpy.types.PropertyGroup):
     name:bpy.props.StringProperty(
         name="Video Folder Name", default = 'Video')
     render_inside:bpy.props.BoolProperty(
         name="Render Inside", default=False)
-
+    
+    
 class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
    # CenterObj: bpy.props.PointerProperty(name="Object", type=Object)
 
@@ -44,7 +52,7 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name="Snippets Folder Name", default = 'Snippets')
 
     mode: bpy.props.EnumProperty(
-        name='',  # SingleCoupltypes
+        name='',  
         description='List of forms avaiable in single connector mode',
         default='2',
         items=[('1', 'Collect Original', ''),
@@ -52,6 +60,8 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
                ('3', 'Collect Blend Elements', ''),
                ]
     )
+    
+    #sequences:bpy.props.CollectionProperty(type=VSE_Archiver_SequenceStrip)
 
     render_imagesequence: bpy.props.BoolProperty(
         name="Render Image Sequence", default=True, description='When checked Imagesequences will be rendered out, rather than copied')
@@ -62,7 +72,7 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
     render_scenestrip: bpy.props.BoolProperty(
         name="Render Scene Strip", default=True, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
 
-    render_audio: bpy.props.BoolProperty(
+    render_sound: bpy.props.BoolProperty(
         name="Render Audio Strip", default=True, description='When checked Scenestrip will be rendered out and the result will replace this strip, rather than copied and remaped')
 
     render_metastrip: bpy.props.BoolProperty(
@@ -72,7 +82,8 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name="Render Movie", default=True, description='When checked each Movie is handled will be rendered out and the result will replace this strip, rather than copied and remaped')
 
 
-    #meta_strip_depth: bpy.props.IntProperty(
-    #    name="Meta Strip Depth", default=0, min=0)
+   
+    metastrips: bpy.props.CollectionProperty(type=VSE_Archiver_MetaStrip)
+    #sequences:bpy.props.CollectionProperty(type=VSE_Archiver_MetaStrip)
     
-    metastrips:bpy.props.CollectionProperty(type=VSE_Archiver_MetaStrip)
+    sequences:  bpy.props.CollectionProperty(type=VSE_Archiver_SequenceStrip)

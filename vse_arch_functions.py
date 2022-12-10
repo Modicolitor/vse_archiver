@@ -9,6 +9,10 @@ from .vse_arch_definitions import is_audio, is_video
 def copy_file(src, dst):
     shutil.copy2(src, dst)
 
+def print_list(list):
+    for n,l in enumerate(list):
+        print(f'{n}     {l}')
+
 def get_video_target_path(context, filepath, vid_directories):
     #print(f'In get video path filepath {filepath} directory {directory} vid_directories {vid_directories} ')
     arch_props = context.scene.vse_archiver
@@ -498,7 +502,7 @@ def homogenous_addon_settings_over_scene(context):
         va = sc.vse_archiver
         va.rebuild = context.scene.vse_archiver.rebuild
         va.remove_fade = context.scene.vse_archiver.remove_fade
-        va.render_audio = context.scene.vse_archiver.render_audio
+        va.render_sound = context.scene.vse_archiver.render_sound
         va.render_image = context.scene.vse_archiver.render_image
         va.render_imagesequence = context.scene.vse_archiver.render_imagesequence
         va.render_metastrip = context.scene.vse_archiver.render_metastrip
@@ -719,14 +723,14 @@ def copy_or_render(context, scene, seq):
     
     if type == 'IMAGE':
         #print(f'found image {seq.name} render_image {arch_props.render_image}')
-        if arch_props.render_image:
+        if arch_props.render_image and get_seq_render_tag(scene, seq):
             return 'RENDER'
         else:
             return 'COPY'
     
     if type == 'IMGSEQ':
         #print(f'found Imgseq {seq.name} render_imageseq {arch_props.render_imagesequence}')
-        if arch_props.render_imagesequence:
+        if arch_props.render_imagesequence and get_seq_render_tag(scene, seq):
             return 'RENDER'
         else:
             return 'COPY'        
@@ -738,7 +742,7 @@ def copy_or_render(context, scene, seq):
         else:
             return 'COPY'
     if type =='SOUND':
-        if arch_props.render_audio:
+        if arch_props.render_sound and get_seq_render_tag(scene, seq):
             return 'RENDER'
         else:
             return 'COPY'
@@ -749,12 +753,18 @@ def copy_or_render(context, scene, seq):
         return 'META'
 
     if type == 'MOVIE':
-        if arch_props.render_movie: 
+        if arch_props.render_movie and get_seq_render_tag(scene, seq): 
             return 'RENDER'
         else:
             return 'COPY'
     
-   
+def get_seq_render_tag(scene, seq):
+    for s in scene.vse_archiver.sequences:
+        if s.name == seq.name:
+            return s.pls_render
+    
+    
+
 
 def get_sequence_type(context, seq): 
     
@@ -830,8 +840,7 @@ def reset_metastrips(context):
 ####adds metastrips that are not present yet in the list ; renaming strips,  after making   
 def update_metastrips(context):
     print('in updates ') 
-    
-    
+
     ######################PROBLEM In verschiedenen Scenen können Strips den gleich namen haben, nur nicht innerhalb der scene, aber es ist ja eh per scene gespeichert 
     for sc in bpy.data.scenes:
         sequences = sc.sequence_editor.sequences_all
@@ -846,7 +855,52 @@ def update_metastrips(context):
                     ele.name = seq.name 
     
         ####looks for old metastrip data with no counter part in the current state  
-        for ele in arch_metastrips:
+        for n,ele in enumerate(arch_metastrips):
             if ele.name not in sequences:
-                arch_metastrips.remove(ele.name)
+                arch_metastrips.remove(n)
                
+               
+def reset_sequences_data(context):
+    for sc in bpy.data.scenes:
+        #sequences = sc.sequence_editor.sequences_all
+        arch_sequences = sc.vse_archiver.sequences
+        
+        for n,ele in enumerate(arch_sequences):
+            arch_sequences.remove(n)
+    update_sequences_data(context)
+
+####adds metastrips that are not present yet in the list ; renaming strips,  after making   
+def update_sequences_data(context):
+    print('in update sequences') 
+
+    ######################PROBLEM In verschiedenen Scenen können Strips den gleich namen haben, nur nicht innerhalb der scene, aber es ist ja eh per scene gespeichert 
+    for sc in bpy.data.scenes:
+        sequences = sc.sequence_editor.sequences_all
+        vse_archiver = sc.vse_archiver
+        arch_sequences = sc.vse_archiver.sequences
+        
+        for seq in sequences:
+            #print(f'seq {seq.name} ')
+            
+            if seq.name not in arch_sequences:
+                type = get_sequence_type(context, seq)
+                if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ']:
+                    print(f'ele {seq.name} ')
+                    ele = arch_sequences.add()
+                    ele.name = seq.name 
+                    if type == 'MOVIE':
+                        ele.pls_render = vse_archiver.render_movie
+                    elif type == 'SOUND':
+                        ele.pls_render = vse_archiver.render_sound
+                    elif type == 'IMAGE':
+                        ele.pls_render = vse_archiver.render_image
+                    elif type == 'IMGSEQ':
+                        ele.pls_render = vse_archiver.render_imagesequence
+                
+                
+                
+    
+        ####looks for old metastrip data with no counter part in the current state  
+        for n,ele in enumerate(arch_sequences):
+            if ele.name not in sequences:
+                arch_sequences.remove(n)

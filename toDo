@@ -26,11 +26,13 @@ what about effects strips getting removed when changing the
 
 Bugs: 
 Copy original: 
-    [+] Sounds which are connected to videos should be reconnected to the video folder and not audio
+    
     
     #[?] fonts not supported
     
     [] remove fade for render and reapply after render (mainstrip, but also effect strips)
+    [] add frames to bgeinning and end of the sequences (scheint anstrengend wenn man kurz drüber nachdenkt)
+
     [] use scene render settings (also for the other scenes)
     
     [] individual sequence list where you can per element decide whether copy or render
@@ -39,8 +41,9 @@ Copy original:
 
     [] absolut path from relative path for archiv folder
 
-
+    [] test scene render stuff
     
+    [] back to original scene after snippets
 what else could be missing: 
 - caches? 
 
