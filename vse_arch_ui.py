@@ -93,8 +93,8 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 
                 
                 box = subcol.box()
-                box.alignment = 'RIGHT'
-                
+                #box.alignment = 'RIGHT'
+                box.label(text='Settings by Type')
                 '''box.label(text='General Settings')
                 box.prop(arch_props, "render_image")
                 box.prop(arch_props, "render_imagesequence")
@@ -104,8 +104,9 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 box.prop(arch_props, "render_movie")'''
                 
                 row = box.row(heading='Images')
-                row = row.split(factor=0.3)
-                row.label(text='Images ')#'              '
+                #row1 = row.split(factor=0.6)
+                row.label(text='Images               ')#'    
+                
                 if arch_props.render_image:
                             
                     row.operator("varch.imgoff",
