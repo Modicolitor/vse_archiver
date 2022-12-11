@@ -13,6 +13,23 @@ class VSE_Archiver_MetaStrip(bpy.types.PropertyGroup):
     render_inside:bpy.props.BoolProperty(
         name="Render Inside", default=False)
     
+class VSE_Archiver_Keys(bpy.types.PropertyGroup):
+    seq_name:bpy.props.StringProperty(
+        name="name", default = 'name')
+    data_path: bpy.props.StringProperty(
+        name="Datapath", default = 'blend_alpha')
+    frame:bpy.props.FloatProperty(
+        default = 1)
+    value:bpy.props.FloatProperty(
+        default = 1)
+    interpolation:bpy.props.StringProperty(
+        name="Datapath", default = 'inter')
+    handle_right_type:bpy.props.StringProperty(
+        name="htype", default = 'type')
+    handle_left_type:bpy.props.StringProperty(
+        name="htype", default = 'typeleft')
+    attr:bpy.props.StringProperty(
+        name="finalelement", default = 'blend_alpha')
     
 class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
    # CenterObj: bpy.props.PointerProperty(name="Object", type=Object)
@@ -87,3 +104,5 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
     #sequences:bpy.props.CollectionProperty(type=VSE_Archiver_MetaStrip)
     
     sequences:  bpy.props.CollectionProperty(type=VSE_Archiver_SequenceStrip)
+    
+    keys:  bpy.props.CollectionProperty(type=VSE_Archiver_Keys)

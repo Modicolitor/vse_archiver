@@ -648,6 +648,18 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     if not is_meta:
         set_vis_for_render([seq], scene)
     
+    ###handle fade
+    
+    scene.vse_archiver.keys.clear()
+    #generate a fade keyframes from the visible sequences
+    all_vis = get_all_visible_sequences(scene)
+    if arch_props.remove_fade:
+        keylist = get_fades(scene, all_vis)
+        remove_fades(scene, all_vis)
+    oldname=copy.copy(seq.name)
+    
+    #print(bb)
+    
     #set video render (seems to need the setting in the active scene and not the processed scene)
     scene.render.image_settings.file_format = 'FFMPEG'
     context.scene.render.image_settings.file_format = 'FFMPEG'
@@ -685,6 +697,8 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     if arch_props.rebuild:
         new_seq = replace_sequence_w_rendered(context, scene, seq, renderpath)
     
+    if arch_props.remove_fade:
+        reset_fade_keyframes(scene, oldname, new_seq, keylist)
     
     ##filepathes only meant for copying original files
     target_directory, basename = os.path.split(renderpath)
@@ -919,3 +933,146 @@ def update_sequences_data(context):
         for n,ele in enumerate(arch_sequences[:]):
             if ele.name not in sequences:
                 arch_sequences.remove(n)
+                
+                
+def remove_fades(scene, seqs):
+    print('in remove fades')
+    print_list(seqs)
+    for seq in seqs:
+        fcs = fade_fcs(scene, seq)
+        print_list(fcs)
+        if len(fcs) !=  0:
+            for fc in fcs[:]:
+                print(f'removed fc {fc.data_path}')
+                s = get_attr_from_string(scene, fc.data_path)
+                scene.animation_data.action.fcurves.remove(fc)
+                if hasattr(s, 'volume'):
+                    s.volume = 1.0
+                elif hasattr(s, 'blend_alpha'):
+                    s.blend_alpha = 1.0
+                
+
+
+def get_attr_from_string(scene, txt):
+    #from operator import attrgetter
+    #return attrgetter(txt)(ob)
+    '''path_ele = txt.split('.')
+    print(path_ele)
+     
+    for ele in path_ele:
+        print(ele)
+        ob = getattr(ob, ele) 
+        
+    return ob'''
+     
+    scan = False
+    for n, t in enumerate(txt):
+        print(t)
+        ##ignore strings 
+        if t == "'" or t == '"':
+            if not scan:
+                start = n 
+                scan = not scan
+            else:
+                end = n
+                break
+    seq_name = txt[start+1:end]
+    seq = scene.sequence_editor.sequences_all[seq_name]
+    
+    #attribute
+    #eles= txt.split('.')
+    #attr = getattr(seq, eles[-1])
+    
+    return seq  
+
+    
+    
+                
+def get_fades(scene, seqs):
+    #find fade data 
+    keylist = []
+    for seq in seqs:
+        fcs = fade_fcs(scene, seq)
+        if len(fcs) !=  0:
+            for fc in fcs:
+                keylist.extend(get_fade_keydatalist(scene, seq, fc))
+    return keylist
+            
+
+
+def fade_fcs(scene, seq):
+    fcs = []
+    for fc in scene.animation_data.action.fcurves:
+        print(f'fc data path {fc.data_path}')
+        if fadetypes_in_datapath(fc.data_path):
+            print(f'check1 seq name {seq.name}')
+            if seq.name in fc.data_path:
+                print('check2')
+                print(f'found fcurve of seq {seq.name}')
+                fcs.append(fc)            
+    return fcs
+    #return None
+            
+
+def fadetypes_in_datapath(data_path):
+    if 'blend_alpha' in data_path:
+        return True
+    if 'volume' in data_path:
+        return True
+
+    return False
+
+
+#get the keydata 
+def get_fade_keydatalist(scene, seq, fc):
+    keys = scene.vse_archiver.keys
+    keylist = []
+    for key in fc.keyframe_points:
+        new = keys.add()
+        new.seq_name = seq.name
+        new.data_path= fc.data_path
+        new.frame = key.co[0]
+        new.value = key.co[1]
+        new.handle_right_type=key.handle_right_type
+        new.handle_left_type=key.handle_left_type
+        l = fc.data_path.split('.')
+        new.attr = l[-1]
+        keylist.append(new)
+    return keylist
+
+
+
+def reset_fade_keyframes(scene, oldname, newseq, keys):
+    print('in reset fade')
+    keys = scene.vse_archiver.keys
+    print_list(keys)
+    print(f'')
+    for key in keys:
+        if key.seq_name == oldname:
+            data_path = key.data_path.replace(oldname, newseq.name)
+            newkey = scene.keyframe_insert(data_path)
+            set_keyframes(scene, newseq, key.attr,  key.value, key.frame)
+            #newkey.co = (key.frame, key.value)
+    
+    '''context.scene.frame_current = start[0]
+    mod.time = start[1]
+    mod.keyframe_insert(data_path="time")
+
+    context.scene.frame_current = end[0]
+    mod.time = end[1]
+    mod.keyframe_insert(data_path="time")
+
+    if hasattr(ocean.animation_data, 'action'):
+        for fcu in ocean.animation_data.action.fcurves:
+            for keyframe in fcu.keyframe_points:
+                keyframe.interpolation = 'LINEAR'''
+                
+                
+def set_keyframes(scene, path, target,  value, frame):
+    oriframe = copy.copy(scene.frame_current)
+    scene.frame_current = int(frame)
+    setattr(path, target, value)
+
+    path.keyframe_insert(data_path=target)
+
+    scene.frame_current = oriframe

@@ -53,6 +53,7 @@ from .vse_arch_operators import PP_OT_Arch_RenderImage_Off
 from .vse_arch_ui import PP_PT_VSEArchiver_Menu
 from .vse_arch_properties import VSE_Archiver_MetaStrip
 from .vse_arch_properties import VSE_Archiver_SequenceStrip
+from .vse_arch_properties import VSE_Archiver_Keys
 from .vse_arch_properties import VSE_Archiver_PropGroup
 from .bl_archiver_properties import Bl_Archiver_PropGroup
 from .bl_archiver_operators import BA_OT_Initialize_Bl_Archiver
@@ -71,6 +72,7 @@ classes = (    PP_OT_Collect_VSE_Original,
        PP_PT_VSEArchiver_Menu,
        VSE_Archiver_MetaStrip,
        VSE_Archiver_SequenceStrip,
+       VSE_Archiver_Keys,
        VSE_Archiver_PropGroup,
        Bl_Archiver_PropGroup,
        BA_PT_BlArchiver_Menu,
