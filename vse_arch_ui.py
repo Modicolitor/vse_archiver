@@ -31,7 +31,7 @@ def has_equal_sequences(context):
     for sc in bpy.data.scenes:
         for s in sc.sequence_editor.sequences_all:
             type = get_sequence_type(context, s)
-            if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ']:
+            if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']:
                 c += 1
             
                 
@@ -63,178 +63,211 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
         row = layout.row()
 
         subcol = col.column()
+        
 
         if hasattr(context.scene, "vse_archiver"):  # "PuzzleUrPrint" in data.collections and
             arch_props = context.scene.vse_archiver
-            subcol = col.column()
+            if arch_props.is_archiv:
+                subcol.label(text='You are in the archived blendfile!')
+                subcol.operator("varch.rmvarchivetag", text="Allow Archiving",
+                                    icon="RESTRICT_RENDER_OFF")
+            else:  
+                
+                subcol = col.column()
+                
+                subcol.prop(arch_props, "target_folder")
+                subcol.prop(arch_props, "mode")
+                subcol.prop(arch_props, "rebuild", text='Rebuild Blend')
+                subcol.prop(arch_props, "use_blend_data", text='Include BlendData')
 
-            subcol.prop(arch_props, "mode")
-            subcol.prop(arch_props, "target_folder")
-            subcol.prop(arch_props, "rebuild", text='Rebuild Blend')
-
-            if arch_props.mode == '1':
+                if arch_props.mode == '1':
+                    
+                    subcol.operator("varch.coloriginal", text="Archiv Originals",
+                                    icon="COPYDOWN")
                 
-                subcol.operator("varch.coloriginal", text="Archiv Originals",
-                                icon="COPYDOWN")
-            
-            if arch_props.mode == '2':
-                subcol.prop(arch_props, "remove_fade")
-                subcol.operator("varch.colsnippets", text="Archiv Snippets",
-                                icon="RESTRICT_RENDER_OFF")
-                
-                
-                
-                if not has_equal_sequences(context) or not has_equal_metas(context):
-                    subcol.label(text="Update Data!")
-                
-                
-                subcol.operator("varch.updmeta", text="Update Sequence Data", icon="FILE_REFRESH")
-                subcol.operator("varch.resetmeta", text="Reset Sequence Data", icon="TRACKING_CLEAR_BACKWARDS")
-                
-                
-                box = subcol.box()
-                #box.alignment = 'RIGHT'
-                box.label(text='Settings by Type')
-                '''box.label(text='General Settings')
-                box.prop(arch_props, "render_image")
-                box.prop(arch_props, "render_imagesequence")
-                box.prop(arch_props, "render_scenestrip")
-                box.prop(arch_props, "render_sound")
-                box.prop(arch_props, "render_metastrip")
-                box.prop(arch_props, "render_movie")'''
-                
-                row = box.row(heading='Images')
-                #row1 = row.split(factor=0.6)
-                row.label(text='Images               ')#'    
-                
-                if arch_props.render_image:
-                            
-                    row.operator("varch.imgoff",
-                                icon="UNPINNED", text="Copy", depress=False)
-                    row.operator("varch.imgoff",
-                                icon="PINNED", text="Render", depress=True)
-                else:
-                    row.operator("varch.imgon",
-                                icon="UNPINNED", text="Copy", depress=True)
-                    row.operator("varch.imgoff",
-                                icon="PINNED", text="Render", depress=False)
-                
-                row = box.row()
-                row.label(text='Imagesequences')
-                if arch_props.render_imagesequence:
-                            
-                    row.operator("varch.imgseqoff",
-                                icon="UNPINNED", text="Copy", depress=False)
-                    row.operator("varch.imgseqon",
-                                icon="PINNED", text="Render", depress=True)
-                else:
-                    row.operator("varch.imgseqoff",
-                                icon="UNPINNED", text="Copy", depress=True)
-                    row.operator("varch.imgseqon",
-                                icon="PINNED", text="Render", depress=False)
-                
-                row = box.row()
-                row.label(text='Scenes                ')
-                if arch_props.render_scenestrip:
-                            
-                    row.operator("varch.scnoff",
-                                icon="UNPINNED", text="Copy", depress=False)
-                    row.operator("varch.scnon",
-                                icon="PINNED", text="Render", depress=True)
-                else:
-                    row.operator("varch.scnoff",
-                                icon="UNPINNED", text="Copy", depress=True)
-                    row.operator("varch.scnon",
-                                icon="PINNED", text="Render", depress=False)
+                if arch_props.mode == '2':
+                    subcol.prop(arch_props, "remove_fade")
+                    subcol.operator("varch.colsnippets", text="Archiv Snippets",
+                                    icon="RESTRICT_RENDER_OFF")
                     
                     
-                row = box.row()
-                row.label(text='Audio                  ')
-                if arch_props.render_sound:
-                            
-                    row.operator("varch.soundoff",
-                                icon="UNPINNED", text="Copy", depress=False)
-                    row.operator("varch.soundon",
-                                icon="PINNED", text="Render", depress=True)
-                else:
-                    row.operator("varch.soundoff",
-                                icon="UNPINNED", text="Copy", depress=True)
-                    row.operator("varch.soundon",
-                                icon="PINNED", text="Render", depress=False)
-                
-                row = box.row()
-                row.label(text='Metastrips           ')
-                if arch_props.render_metastrip:
-                            
-                    row.operator("varch.gmetaoff",
-                                icon="UNPINNED", text="Copy", depress=False)
-                    row.operator("varch.gmetaon",
-                                icon="PINNED", text="Render", depress=True)
-                else:
-                    row.operator("varch.gmetaoff",
-                                icon="UNPINNED", text="Copy", depress=True)
-                    row.operator("varch.gmetaon",
-                                icon="PINNED", text="Render", depress=False)
                     
                     
-                row = box.row()
-                row.label(text='Movie                  ')
-                if arch_props.render_movie:
-                            
-                    row.operator("varch.movieoff",
-                                icon="UNPINNED", text="Copy", depress=False)
-                    row.operator("varch.movieon",
-                                icon="PINNED", text="Render", depress=True)
-                else:
-                    row.operator("varch.movieoff",
-                                icon="UNPINNED", text="Copy", depress=True)
-                    row.operator("varch.movieon",
-                                icon="PINNED", text="Render", depress=False)    
-                
-                
-                box = col.box() 
-                box.label(text='Individual Settings')
-                row = box.row()
-                ###active data set
-                
-                active = context.active_sequence_strip
-                if active != None:
-                    if active.name in arch_props.metastrips:
-                        #subcol.prop(arch_props.metastrips[active.name], "render_inside")
-                        if get_seq_render_tag(context.scene, active):
-                                row.operator("varch.metoff",
-                                            icon="UNPINNED", text="Render", depress=False)
-                                row.operator("varch.meton",
-                                            icon="PINNED", text="Use Inside", depress=True)
+                    
+                    
+                    box = subcol.box()
+                    #box.alignment = 'RIGHT'
+                    box.label(text='Settings by Type')
+                    '''box.label(text='General Settings')
+                    box.prop(arch_props, "render_image")
+                    box.prop(arch_props, "render_imagesequence")
+                    box.prop(arch_props, "render_scenestrip")
+                    box.prop(arch_props, "render_sound")
+                    box.prop(arch_props, "render_metastrip")
+                    box.prop(arch_props, "render_movie")'''
+                    
+                    row = box.row(heading='Images')
+                    #row1 = row.split(factor=0.6)
+                    row.label(text='Images               ')#'    
+                    
+                    if arch_props.render_image:
                                 
-                        else:
-                            row.operator("varch.metoff",
-                                        icon="UNPINNED", text="Render", depress=True)
-                            row.operator("varch.meton",
-                                        icon="PINNED", text="Use Inside", depress=False)
+                        row.operator("varch.imgoff",
+                                    icon="UNPINNED", text="Copy", depress=False)
+                        row.operator("varch.imgoff",
+                                    icon="PINNED", text="Render", depress=True)
+                    else:
+                        row.operator("varch.imgon",
+                                    icon="UNPINNED", text="Copy", depress=True)
+                        row.operator("varch.imgoff",
+                                    icon="PINNED", text="Render", depress=False)
                     
-                    if active.name in arch_props.sequences:
-                        #if active.name not in arch_props.metastrips:
-                            
-                        #subcol.prop(arch_props.sequences[active.name], "pls_render", text='Render Sequence')
+                    row = box.row()
+                    row.label(text='Imagesequences')
+                    if arch_props.render_imagesequence:
+                                
+                        row.operator("varch.imgseqoff",
+                                    icon="UNPINNED", text="Copy", depress=False)
+                        row.operator("varch.imgseqon",
+                                    icon="PINNED", text="Render", depress=True)
+                    else:
+                        row.operator("varch.imgseqoff",
+                                    icon="UNPINNED", text="Copy", depress=True)
+                        row.operator("varch.imgseqon",
+                                    icon="PINNED", text="Render", depress=False)
+                    
+                    row = box.row()
+                    row.label(text='Movie                  ')
+                    if arch_props.render_movie:
+                                
+                        row.operator("varch.movieoff",
+                                    icon="UNPINNED", text="Copy", depress=False)
+                        row.operator("varch.movieon",
+                                    icon="PINNED", text="Render", depress=True)
+                    else:
+                        row.operator("varch.movieoff",
+                                    icon="UNPINNED", text="Copy", depress=True)
+                        row.operator("varch.movieon",
+                                    icon="PINNED", text="Render", depress=False)   
                         
-                        if get_seq_render_tag(context.scene, active):
-                            
-                            row.operator("varch.seqoff",
-                                        icon="UNPINNED", text="Copy", depress=False)
-                            row.operator("varch.seqon",
-                                        icon="PINNED", text="Render", depress=True)
-                        else:
-                            row.operator("varch.seqoff",
-                                        icon="UNPINNED", text="Copy", depress=True)
-                            row.operator("varch.seqon",
-                                        icon="PINNED", text="Render", depress=False)
-                            
+                        
+                    row = box.row()
+                    row.label(text='Audio                  ')
+                    if arch_props.render_sound:
                                 
+                        row.operator("varch.soundoff",
+                                    icon="UNPINNED", text="Copy", depress=False)
+                        row.operator("varch.soundon",
+                                    icon="PINNED", text="Render", depress=True)
+                    else:
+                        row.operator("varch.soundoff",
+                                    icon="UNPINNED", text="Copy", depress=True)
+                        row.operator("varch.soundon",
+                                    icon="PINNED", text="Render", depress=False)
+                    
+                    
+                    
+                    row = box.row()
+                    row.label(text='Metastrips           ')
+                    if arch_props.render_metastrip:
+                                
+                        row.operator("varch.gmetaoff",
+                                    icon="UNPINNED", text="Inside", depress=False)
+                        row.operator("varch.gmetaon",
+                                    icon="PINNED", text="Render", depress=True)
+                    else:
+                        row.operator("varch.gmetaoff",
+                                    icon="UNPINNED", text="Inside", depress=True)
+                        row.operator("varch.gmetaon",
+                                    icon="PINNED", text="Render", depress=False)
+                    
+                    
+                    row = box.row()
+                    row.label(text='Scenes                ')
+                    if arch_props.render_scenestrip:
+                                
+                        row.operator("varch.scnoff",
+                                    icon="UNPINNED", text="Ignore", depress=False)
+                        row.operator("varch.scnon",
+                                    icon="PINNED", text="Render", depress=True)
+                    else:
+                        row.operator("varch.scnoff",
+                                    icon="UNPINNED", text="Ignore", depress=True)
+                        row.operator("varch.scnon",
+                                    icon="PINNED", text="Render", depress=False)    
+                        
+                     
+                    
+                    
+                    box = col.box() 
+                    box.label(text='Individual Settings')
+                   
+                    
+                    row = box.row()
+                    #box = col.box() 
+                    active = context.active_sequence_strip
+                    if active != None:
+                        if active.name in arch_props.metastrips:
+                            #subcol.prop(arch_props.metastrips[active.name], "render_inside")
+                            if get_seq_render_tag(context.scene, active):
+                                    row.operator("varch.meton",
+                                                icon="PINNED", text="Use Inside", depress=True)
+                                    row.operator("varch.metoff",
+                                                icon="UNPINNED", text="Render", depress=False)
+                                    
+                                    
+                            else:
+                                row.operator("varch.meton",
+                                            icon="PINNED", text="Use Inside", depress=False)
+                                row.operator("varch.metoff",
+                                            icon="UNPINNED", text="Render", depress=True)
+                                
+                        
+                        if active.name in arch_props.sequences:
+                            #if active.name not in arch_props.metastrips:
+                                
+                            #subcol.prop(arch_props.sequences[active.name], "pls_render", text='Render Sequence')
                             
-                
-                
+                            if get_seq_render_tag(context.scene, active):
+                                
+                                row.operator("varch.seqoff",
+                                            icon="UNPINNED", text="Copy", depress=False)
+                                row.operator("varch.seqon",
+                                            icon="PINNED", text="Render", depress=True)
+                            else:
+                                row.operator("varch.seqoff",
+                                            icon="UNPINNED", text="Copy", depress=True)
+                                row.operator("varch.seqon",
+                                            icon="PINNED", text="Render", depress=False)
+                                
+                    subcol =  box.column()
+                    ###active data set
 
+                    
+                    subcol.operator("varch.updmeta", text="Update Sequence Data", icon="FILE_REFRESH")
+                    subcol.operator("varch.resetmeta", text="Reset Sequence Data", icon="TRACKING_CLEAR_BACKWARDS")
+                    
+                    
+                    
+                    
+                    is_image, not_ffmpeg, no_audio = check_rendersettings(context)
+                    has_equal_seq = has_equal_sequences(context)
+                    has_equal_met = has_equal_metas(context)
+                    
+                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met:
+                        subcol =  col.box() 
+                        subcol.label(text="Warning")
+                    
+                    if not has_equal_seq or not has_equal_met:
+                        subcol.label(text="Update Data!")
+                    
+                    
+                    if is_image:
+                        subcol.label(text="Imageformat selected for render!")
+                    if not_ffmpeg:
+                        subcol.label(text="FFMpeg Video is recommended!")
+                    if no_audio:
+                        subcol.label(text="Audio rendering is disabled!")
 
         else:
 
@@ -242,3 +275,22 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                             icon="PLUS")
             
             
+def check_rendersettings(context):
+    is_image = True
+    not_ffmpeg = True
+    no_audio = False
+    
+    
+    #videoformats = ['FFMPEG', 'AVI_RAW', 'AVI_JPEG']
+    
+    #print(f'{context.scene.render.image_settings.file_format == 'FFMPEG'}')
+    file_format = context.scene.render.image_settings.file_format
+    if file_format == 'FFMPEG' or file_format == 'AVI_RAW' or file_format == 'AVI_JPEG':
+        is_image = False
+    if file_format == 'FFMPEG':
+        not_ffmpeg = False
+    if context.scene.render.ffmpeg.audio_codec == 'NONE' or not_ffmpeg == True:
+        no_audio = True
+
+    
+    return is_image, not_ffmpeg, no_audio

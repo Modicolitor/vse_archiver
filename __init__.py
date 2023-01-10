@@ -48,6 +48,7 @@ from .vse_arch_operators import PP_OT_Arch_RenderImgSeq_On
 from .vse_arch_operators import PP_OT_Arch_RenderImgSeq_Off
 from .vse_arch_operators import PP_OT_Arch_RenderImage_On
 from .vse_arch_operators import PP_OT_Arch_RenderImage_Off
+from .vse_arch_operators import PP_OT_Arch_RemoveArchivetag
 
 
 from .vse_arch_ui import PP_PT_VSEArchiver_Menu
@@ -95,7 +96,8 @@ classes = (    PP_OT_Collect_VSE_Original,
     PP_OT_Arch_RenderImgSeq_On,
     PP_OT_Arch_RenderImgSeq_Off,
     PP_OT_Arch_RenderImage_On,
-    PP_OT_Arch_RenderImage_Off
+    PP_OT_Arch_RenderImage_Off,
+    PP_OT_Arch_RemoveArchivetag,
        )
 #classes = ()
 register, unregister = bpy.utils.register_classes_factory(classes)

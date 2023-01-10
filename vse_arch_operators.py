@@ -33,7 +33,11 @@ class PP_OT_Collect_VSE_Original(bpy.types.Operator):
     def poll(cls, context):
         arch_props = context.scene.vse_archiver
         target_folder = arch_props
-       
+        #path must be absolut 
+        
+        print(f'mode {context.mode} and type {context.area.type}')
+        #if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
+        
         return target_folder != None or target_folder[0] == '/' and target_folder[1] == '/'
 
     def execute(self, context):
@@ -364,10 +368,7 @@ class PP_OT_Arch_RenderScene_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_scenestrip = False
-            
-            
-        
-        
+       
         return{"FINISHED"}
     
     
@@ -517,3 +518,26 @@ class PP_OT_Arch_RenderMovie_Off(bpy.types.Operator):
         
         return{"FINISHED"}
 
+class PP_OT_Arch_RemoveArchivetag(bpy.types.Operator):
+    '''Get Archiver Options Back'''
+
+    bl_label = "Allow Archiving"
+    bl_idname = "varch.rmvarchivetag"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        
+        arch_props = context.scene.vse_archiver
+      
+        return True
+
+    def execute(self, context):
+        if hasattr(context.scene, 'vse_archiver'):
+            archiver = context.scene.vse_archiver
+            archiver.is_archiv = False
+            
+            
+        
+        
+        return{"FINISHED"}

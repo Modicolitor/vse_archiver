@@ -273,7 +273,8 @@ def equalize_directory(directory):
 def collect_originals(context):
     arch_props = context.scene.vse_archiver
     
-    arch_props.target_folder = os.path.abspath(arch_props.target_folder)
+    arch_props.target_folder = bpy.path.abspath(arch_props.target_folder)
+    
     print(arch_props.target_folder)
     ###make pathes absolut
     bpy.ops.file.make_paths_absolute()
@@ -294,9 +295,9 @@ def collect_originals(context):
 
     # check non-vse part for elements to copy 
     if arch_props.use_blend_data:
-        filepathes = collect_sounds(context, filepathes, audio_directories, vid_directories) 
-        filepathes = collect_moviclips(context, filepathes, vid_directories)
-        filepathes = collect_fonts(context, filepathes, font_directories)
+        filepathes, audio_directories, vid_directories = collect_sounds(context, filepathes, audio_directories, vid_directories) 
+        filepathes, vid_directories = collect_moviclips(context, filepathes, vid_directories)
+        filepathes, font_directories = collect_fonts(context, filepathes, font_directories)
         filepathes, imgseq_directories = collect_images(context, filepathes, imgseq_directories)
 
     
@@ -328,14 +329,14 @@ def collect_moviclips(context, filepathes, vid_directories):
         if mc.filepath  not in filepathes:
             directory, basename = os.path.split(mc.filepath)
             filepathes[mc.filepath], vid_directories = get_video_target_path(context, mc.filepath, vid_directories)
-    return filepathes
+    return filepathes, vid_directories
 
 def collect_sounds(context, filepathes, audio_directories, vid_directories):
     data = bpy.data 
     for sound in data.sounds:
         if sound.filepath  not in filepathes:
             filepathes[sound.filepath], audio_directories, vid_directories = get_audio_target_path(context, sound.filepath, audio_directories, vid_directories)
-    return filepathes
+    return filepathes, audio_directories, vid_directories
 
 def collect_fonts(context, filepathes, font_directories):
     data = bpy.data 
@@ -343,7 +344,7 @@ def collect_fonts(context, filepathes, font_directories):
         if font.filepath  not in filepathes:
             directory, basename = os.path.split(font.filepath)
             filepathes[font.filepath], font_directories = get_font_target_path(context, font.filepath, font_directories)
-    return filepathes
+    return filepathes, font_directories
 
 def collect_images(context, filepathes, imgseq_directories):
     data = bpy.data 
@@ -352,7 +353,9 @@ def collect_images(context, filepathes, imgseq_directories):
             if img.filepath  not in filepathes:
                 directory, basename = os.path.split(img.filepath)
                 #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
-                targetpath = get_imgseq_target_path(context, basename, directory)
+                targetpath = get_imgseq_target_path(context, basename, directory, imgseq_directories)
+                
+                print(f'targetpath is weird {targetpath}')
                 imgseq_directories[directory] = targetpath
                 
                 if img.filepath not in filepathes:
@@ -426,7 +429,7 @@ def build_blend_from_original(context, filepathes, imgseq_directories, vid_direc
     arch_props = context.scene.vse_archiver
     #save as new blend in the folder 
     save_blend_file(context)
-
+    arch_props.is_archiv = True
     sequences = context.scene.sequence_editor.sequences_all
     #pro sequence, strip filename from path, add filename to target folder path and replace filepath in sequence
     
@@ -461,20 +464,27 @@ def build_blend_from_original(context, filepathes, imgseq_directories, vid_direc
 ##### snippets ######################################################################################################################
 ###main function to started by collect snippets operator ####################################################################################
 def collect_snippets(context): 
-    
+    arch_props = context.scene.vse_archiver 
     filepathes ={}
     imgseq_directories = {}
     vid_directories = {}
     audio_directories = {}
     font_directories = {}
     
+    
     bpy.ops.file.make_paths_absolute()
     
+    arch_props.target_folder = bpy.path.abspath(arch_props.target_folder)
+    #print(d)
     homogenous_addon_settings_over_scene(context)
-            
+    set_rendersettings(context)
+    
+    
+    
     #  gehe durch sequences
     for scene in bpy.data.scenes:
         if hasattr(scene, 'vse_archiver'):
+            #set scene active 
             context.window.scene = scene
             
             
@@ -491,6 +501,14 @@ def collect_snippets(context):
             all_vis_seqs.extend(new_seqs)
             set_sequences_visibility(all_vis_seqs, scene)
     
+    
+    
+    if arch_props.use_blend_data:
+        filepathes, audio_directories, vid_directories = collect_sounds(context, filepathes, audio_directories, vid_directories) 
+        filepathes, vid_directories = collect_moviclips(context, filepathes, vid_directories)
+        filepathes, font_directories = collect_fonts(context, filepathes, font_directories)
+        filepathes, imgseq_directories = collect_images(context, filepathes, imgseq_directories)
+        
     copy_files(filepathes)
                 
     if context.scene.vse_archiver.rebuild:
@@ -544,17 +562,18 @@ def copy_render_decider(context, scene, filepathes, imgseq_directories, sequence
                 
 #supposed to toggle meta strips to the toplevel, but bugged when sequences kein meta_parent()            
 def find_toplevel(context, scene, sequences):
-    print(sequences)
-    if sequences[0].parent_meta() != None:
-        #deselect all 
-        for s in scene.sequence_editor.sequences_all:
-            s.select = False 
-        #toogle 
-        bpy.ops.sequencer.meta_toggle()
+    #print(sequences)
+    if len(sequences) != 0:
+        if sequences[0].parent_meta() != None:
+            #deselect all 
+            for s in scene.sequence_editor.sequences_all:
+                s.select = False 
+            #toogle 
+            bpy.ops.sequencer.meta_toggle()
 
-        #test again
-        sequences = context.sequences #get_visible_sequences(scene)
-        find_toplevel(context, scene, sequences)
+            #test again
+            sequences = context.sequences #get_visible_sequences(scene)
+            find_toplevel(context, scene, sequences)
     
 def get_visible_sequences(scene):
     vis = []
@@ -626,6 +645,26 @@ def set_vis_for_render(seqs, scene):
     #print('necessary seq muted')
     #print(brak)
     
+def set_rendersettings(context):
+    for sc in bpy.data.scenes:
+        sc.render.image_settings.file_format = context.scene.render.image_settings.file_format #'FFMPEG'
+        sc.render.ffmpeg.format = context.scene.render.ffmpeg.format  #'MPEG4'
+        sc.render.ffmpeg.audio_codec = context.scene.render.ffmpeg.audio_codec #'AAC'
+        sc.render.ffmpeg.use_autosplit = context.scene.render.ffmpeg.use_autosplit
+        sc.render.ffmpeg.codec = context.scene.render.ffmpeg.codec
+        sc.render.ffmpeg.constant_rate_factor = context.scene.render.ffmpeg.constant_rate_factor
+        sc.render.ffmpeg.ffmpeg_preset = context.scene.render.ffmpeg.ffmpeg_preset
+        sc.render.ffmpeg.gopsize = context.scene.render.ffmpeg.gopsize
+        sc.render.ffmpeg.max_b_frames = context.scene.render.ffmpeg.max_b_frames
+        sc.render.ffmpeg.audio_codec = context.scene.render.ffmpeg.audio_codec
+        sc.render.ffmpeg.audio_channels = context.scene.render.ffmpeg.audio_channels
+        sc.render.ffmpeg.audio_mixrate = context.scene.render.ffmpeg.audio_mixrate
+        sc.render.ffmpeg.audio_bitrate = context.scene.render.ffmpeg.audio_bitrate
+        sc.render.ffmpeg.audio_volume = context.scene.render.ffmpeg.audio_volume
+        
+        sc.render.image_settings.color_mode = context.scene.render.image_settings.color_mode
+
+    
 def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     arch_props = scene.vse_archiver
     #remember fade 
@@ -660,14 +699,14 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     
     #print(bb)
     
-    #set video render (seems to need the setting in the active scene and not the processed scene)
+    '''#set video render (seems to need the setting in the active scene and not the processed scene)
     scene.render.image_settings.file_format = 'FFMPEG'
-    context.scene.render.image_settings.file_format = 'FFMPEG'
+    #context.scene.render.image_settings.file_format = 'FFMPEG'
     scene.render.ffmpeg.format = 'MPEG4'
-    context.scene.render.ffmpeg.format = 'MPEG4'
+    #context.scene.render.ffmpeg.format = 'MPEG4'
     scene.render.ffmpeg.audio_codec = 'AAC'
-    context.scene.render.ffmpeg.audio_codec = 'AAC'
-
+    #context.scene.render.ffmpeg.audio_codec = 'AAC'
+    '''
     
     # set new name and folder rendering
     filepath = os.path.join(arch_props.target_folder, context.scene.name)
@@ -772,9 +811,6 @@ def copy_or_render(context, scene, seq):
             return 'RENDER'
         else:
             return 'COPY'
-    
-    
-    
     if type == 'META':
         return 'META'
 
@@ -801,7 +837,6 @@ def get_sequence_type(context, seq):
     
     if seq.type == 'MOVIE': #hasattr(seq, "filepath"): #videosequence
        return 'MOVIE'  
-       
     elif seq.type == 'SOUND': # hasattr(seq, "sound"): #audio sequence
         return 'SOUND'
     elif seq.type == 'IMAGE': #hasattr(seq, "directory"):#image sequence
@@ -813,6 +848,8 @@ def get_sequence_type(context, seq):
             return 'IMGSEQ'
     elif seq.type == 'META':
         return 'META'
+    elif seq.type == 'SCENE':
+        return 'SCENE'
     else:
         return seq.type
     
@@ -913,7 +950,7 @@ def update_sequences_data(context):
             
             if seq.name not in arch_sequences:
                 type = get_sequence_type(context, seq)
-                if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ']:
+                if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']:
                     print(f'ele {seq.name} ')
                     ele = arch_sequences.add()
                     ele.name = seq.name 
@@ -925,6 +962,8 @@ def update_sequences_data(context):
                         ele.pls_render = vse_archiver.render_image
                     elif type == 'IMGSEQ':
                         ele.pls_render = vse_archiver.render_imagesequence
+                    elif type == 'SCENE':
+                        ele.pls_render = vse_archiver.render_scenestrip
                 
                 
                 
@@ -1002,14 +1041,15 @@ def get_fades(scene, seqs):
 
 def fade_fcs(scene, seq):
     fcs = []
-    for fc in scene.animation_data.action.fcurves:
-        print(f'fc data path {fc.data_path}')
-        if fadetypes_in_datapath(fc.data_path):
-            print(f'check1 seq name {seq.name}')
-            if seq.name in fc.data_path:
-                print('check2')
-                print(f'found fcurve of seq {seq.name}')
-                fcs.append(fc)            
+    if hasattr(scene.animation_data, 'action'):
+        for fc in scene.animation_data.action.fcurves:
+            print(f'fc data path {fc.data_path}')
+            if fadetypes_in_datapath(fc.data_path):
+                print(f'check1 seq name {seq.name}')
+                if seq.name in fc.data_path:
+                    print('check2')
+                    print(f'found fcurve of seq {seq.name}')
+                    fcs.append(fc)            
     return fcs
     #return None
             

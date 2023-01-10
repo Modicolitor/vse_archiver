@@ -45,10 +45,12 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name="Remove Fade", default=True)
 
     rebuild: bpy.props.BoolProperty(
-        name="Rebuild", default=True, description = 'Saves the blend file in the Archive and remaps all links in sequences and external data.')
+        name="Rebuild", default=True, description = 'Saves the blend file in the Archive Folder and remaps all sequences and Blend data.')
+    is_archiv: bpy.props.BoolProperty(
+        name="New Archive", default=False, description = 'Set True when when file is the result of Archiving')
 
     use_blend_data: bpy.props.BoolProperty(
-        name="Include Blend Data", default=True)
+        name="Include Blend Data", default=True, description='Archiv Images, Imagesequences, Movies, Sounds and Fonts present in the blend data.')
 
     target_video_folder: bpy.props.StringProperty(
         name="Video Folder Name", default = 'Video')
@@ -72,11 +74,12 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
         name='',  
         description='List of forms avaiable in single connector mode',
         default='2',
-        items=[('1', 'Collect Original', ''),
+        items=[('1', 'Collect Originals', ''),
                ('2', 'Collect Snippets', ''),
-               ('3', 'Collect Blend Elements', ''),
+               #('3', 'Collect Blend Elements', ''),
                ]
     )
+    
     
     #sequences:bpy.props.CollectionProperty(type=VSE_Archiver_SequenceStrip)
 
