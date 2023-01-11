@@ -37,10 +37,14 @@ Copy original:
     [] test scene render stuff
 
 Todo
-    [+-+] polls for operators
-    
-    [] Beschreibung Settings by type operators 
-    [] targetpath bug in löschen tuple geschachtelt
+    [+] polls for operators: not updated, no target path
+    [+] initialis updates data 
+
+    [] weird path error catching
+    [] handle unavailable strips
+
+    [ ] Beschreibung Settings by type operators 
+    [+] targetpath bug in löschen tuple geschachtelt
     [+] scene sequence ignore or render individual
     [+] use scene render settings of active scene (and copy to the other scenes?)
     

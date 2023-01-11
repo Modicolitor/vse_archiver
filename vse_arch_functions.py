@@ -13,7 +13,38 @@ def print_list(list):
     for n,l in enumerate(list):
         print(f'{n}     {l}')
         
+def has_equal_metas(context):
+    ####man muss es von data ziehen und durch alle scene  schauen
+    
+    #sequences = context.scene.sequence_editor.sequences_all
+    
+    arch_count = 0
+    c = 0
+    for sc in bpy.data.scenes:
+        for seq in sc.sequence_editor.sequences_all:
+            if seq.type == 'META':
+                c += 1 
+    for sc in bpy.data.scenes:
+        arch_metastrips = sc.vse_archiver.metastrips
+        arch_count += len(arch_metastrips)
+        
+    #print(f'sequence count is {c} and archiver metacount {arch_count}')
+    return c == arch_count
+       
+def has_equal_sequences(context):
+    arch_count = 0
+    c = 0
+    for sc in bpy.data.scenes:
+        for s in sc.sequence_editor.sequences_all:
+            type = get_sequence_type(context, s)
+            if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']:
+                c += 1
+                
+    for sc in bpy.data.scenes:
+        arch_sequences = sc.vse_archiver.sequences
+        arch_count += len(arch_sequences)
 
+    return c == arch_count
 
 def get_video_target_path(context, filepath, vid_directories):
     #print(f'In get video path filepath {filepath} directory {directory} vid_directories {vid_directories} ')
@@ -351,9 +382,12 @@ def collect_images(context, filepathes, imgseq_directories):
     for img in data.images:
         if img.type == 'IMAGE':
             if img.filepath  not in filepathes:
+                print(f'img.filepath {img.filepath}')
                 directory, basename = os.path.split(img.filepath)
                 #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
-                targetpath = get_imgseq_target_path(context, basename, directory, imgseq_directories)
+                print(f'directory,{directory}, basename {basename}')
+                
+                targetpath, imgseq_directories = get_imgseq_target_path(context, basename, directory, imgseq_directories)
                 
                 print(f'targetpath is weird {targetpath}')
                 imgseq_directories[directory] = targetpath

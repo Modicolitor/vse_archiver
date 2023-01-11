@@ -1,48 +1,9 @@
 import bpy
 from .vse_arch_functions import get_sequence_type, print_list, get_seq_render_tag
+from .vse_arch_functions import  has_equal_sequences, has_equal_metas
 
 
 
-def has_equal_metas(context):
-    ####man muss es von data ziehen und durch alle scene  schauen
-    
-    #sequences = context.scene.sequence_editor.sequences_all
-    
-    arch_count = 0
-    c = 0
-    for sc in bpy.data.scenes:
-        for seq in sc.sequence_editor.sequences_all:
-            if seq.type == 'META':
-                c += 1 
-    for sc in bpy.data.scenes:
-        arch_metastrips = sc.vse_archiver.metastrips
-        arch_count += len(arch_metastrips)
-        
-    #print(f'sequence count is {c} and archiver metacount {arch_count}')
-    return c == arch_count
-       
-def has_equal_sequences(context):
-    ####man muss es von data ziehen und durch alle scene  schauen
-    
-    #sequences = context.scene.sequence_editor.sequences_all
-    
-    arch_count = 0
-    c = 0
-    for sc in bpy.data.scenes:
-        for s in sc.sequence_editor.sequences_all:
-            type = get_sequence_type(context, s)
-            if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']:
-                c += 1
-            
-                
-    for sc in bpy.data.scenes:
-        arch_sequences = sc.vse_archiver.sequences
-        arch_count += len(arch_sequences)
-        
-    #print(f'sequence count is {c} and archiver metacount {arch_count}')
-    #print_list(sc.vse_archiver.sequences)
-    
-    return c == arch_count
 
 class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
     bl_space_type = "SEQUENCE_EDITOR"
@@ -72,21 +33,34 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 subcol.operator("varch.rmvarchivetag", text="Allow Archiving",
                                     icon="RESTRICT_RENDER_OFF")
             else:  
-                
+                ######not the archive == Main section of ui
                 subcol = col.column()
                 
                 subcol.prop(arch_props, "target_folder")
                 subcol.prop(arch_props, "mode")
                 subcol.prop(arch_props, "rebuild", text='Rebuild Blend')
-                subcol.prop(arch_props, "use_blend_data", text='Include BlendData')
+                subcol.prop(arch_props, "use_blend_data", text='Include Blend Data')
 
                 if arch_props.mode == '1':
+                    #####collect originals
                     
                     subcol.operator("varch.coloriginal", text="Archiv Originals",
                                     icon="COPYDOWN")
+                    
+                    #####WARNING####
+                    #test for target path
+                    has_targetpath = False
+                    if context.scene.vse_archiver.target_folder != '':
+                        has_targetpath = True
+
+                    if not has_targetpath:
+                        subcol =  col.box() 
+                        subcol.label(text="Warning")
+                        subcol.label(text="No Target Folder selected!")
+                    
                 
                 if arch_props.mode == '2':
-                    subcol.prop(arch_props, "remove_fade")
+                    subcol.prop(arch_props, "remove_fade", text = 'Full opacity during render')
                     subcol.operator("varch.colsnippets", text="Archiv Snippets",
                                     icon="RESTRICT_RENDER_OFF")
                     
@@ -249,7 +223,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     
                     
                     
-                    
+                    #####WARNING####
                     is_image, not_ffmpeg, no_audio = check_rendersettings(context)
                     has_equal_seq = has_equal_sequences(context)
                     has_equal_met = has_equal_metas(context)
@@ -257,7 +231,8 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met:
                         subcol =  col.box() 
                         subcol.label(text="Warning")
-                    
+                    if context.scene.vse_archiver.target_folder == '': #or context.scene.vse_archiver.target_folder == None
+                        subcol.label(text="No Target Folder selected!")
                     if not has_equal_seq or not has_equal_met:
                         subcol.label(text="Update Data!")
                     

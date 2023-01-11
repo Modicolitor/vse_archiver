@@ -3,6 +3,28 @@ import bpy
 from .vse_arch_properties import VSE_Archiver_PropGroup
 from .vse_arch_functions import collect_originals, collect_snippets, update_metastrips, reset_metastrips, update_sequences_data, reset_sequences_data, get_seqdata_from_seq, get_metadata_from_seq
 
+from .vse_arch_functions import  has_equal_sequences, has_equal_metas
+
+
+def is_everythingpoll(context):
+    has_props= hasattr(context.scene, 'vse_archiver')
+    #return False
+    print('test')
+    if has_props:
+        needsupd = True
+        needs_target = True
+        if not has_equal_sequences(context) or not has_equal_metas(context):
+            needsupd = False
+        if context.scene.vse_archiver.target_folder == '': 
+            needs_target = False 
+        
+        print(f'needsupd {needs_target}  needs_target {needs_target}')
+        return needsupd and needs_target
+    return False
+
+    
+
+
 class PP_OT_Initialize_Archiver(bpy.types.Operator):
     '''Archiv Project with the chosen Setting'''
 
@@ -31,15 +53,12 @@ class PP_OT_Collect_VSE_Original(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        arch_props = context.scene.vse_archiver
-        target_folder = arch_props
-        #path must be absolut 
-        
-        print(f'mode {context.mode} and type {context.area.type}')
-        #if context.mode == 'OBJECT' and context.area.type == 'VIEW_3D':
-        
-        return target_folder != None or target_folder[0] == '/' and target_folder[1] == '/'
-
+        has_props= hasattr(context.scene, 'vse_archiver')
+        if has_props:
+            if context.scene.vse_archiver.target_folder != '': 
+                return True
+        return False
+    
     def execute(self, context):
         print('start operator')
         collect_originals(context)
@@ -58,10 +77,8 @@ class PP_OT_Render_VSE_Snippets(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        arch_props = context.scene.vse_archiver
-        target_folder = arch_props
-       
-        return target_folder != None or target_folder[0] == '/' and target_folder[1] == '/'
+        
+        return is_everythingpoll(context)
 
     def execute(self, context):
         print('start operator')
