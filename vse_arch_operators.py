@@ -26,7 +26,7 @@ def is_everythingpoll(context):
 
 
 class PP_OT_Initialize_Archiver(bpy.types.Operator):
-    '''Archiv Project with the chosen Setting'''
+    '''Initialize VSE Archiver Addon'''
 
     bl_label = "Add Single Couplings"
     bl_idname = "varch.init"
@@ -45,7 +45,7 @@ class PP_OT_Initialize_Archiver(bpy.types.Operator):
         return{"FINISHED"}
 
 class PP_OT_Collect_VSE_Original(bpy.types.Operator):
-    '''Archiv Project with the chosen Setting'''
+    '''Archiv Project by copying the source files to the target folder'''
 
     bl_label = "Add Single Couplings"
     bl_idname = "varch.coloriginal"
@@ -69,7 +69,7 @@ class PP_OT_Collect_VSE_Original(bpy.types.Operator):
 
 
 class PP_OT_Render_VSE_Snippets(bpy.types.Operator):
-    '''Archiv Project with the chosen Setting'''
+    '''Archiv Project by rendering or copying the sequences into the target folder'''
 
     bl_label = "Add Single Couplings"
     bl_idname = "varch.colsnippets"
@@ -91,7 +91,7 @@ class PP_OT_Render_VSE_Snippets(bpy.types.Operator):
     
     
 class PP_OT_Arch_UpdateMetastrip(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Update internal sequence list to track the individuel settings'''
 
     bl_label = "Update Metastrip list"
     bl_idname = "varch.updmeta"
@@ -115,7 +115,7 @@ class PP_OT_Arch_UpdateMetastrip(bpy.types.Operator):
     
 
 class PP_OT_Arch_ResetMetastrip(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Reset individual settings to the type settings'''
 
     bl_label = "Update Metastrip list"
     bl_idname = "varch.resetmeta"
@@ -137,12 +137,10 @@ class PP_OT_Arch_ResetMetastrip(bpy.types.Operator):
         #        {'INFO'}, "You are in the new archived blend file, now!!!")
         return{"FINISHED"}
     
-    
-    
-    
+
 #switch
 class PP_OT_Arch_RenderSeq_On(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Render the active sequence'''
 
     bl_label = "Switch On Render for Active"
     bl_idname = "varch.seqon"
@@ -160,12 +158,11 @@ class PP_OT_Arch_RenderSeq_On(bpy.types.Operator):
             seqdata = get_seqdata_from_seq(context, active)
             seqdata.pls_render = True
         
-        
         return{"FINISHED"}
 
 
 class PP_OT_Arch_RenderSeq_Off(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Copy the source of the active sequence'''
 
     bl_label = "Switch On Render for Active"
     bl_idname = "varch.seqoff"
@@ -185,13 +182,12 @@ class PP_OT_Arch_RenderSeq_Off(bpy.types.Operator):
             seqdata = get_seqdata_from_seq(context, active)
             seqdata.pls_render = False
         
-        
         return{"FINISHED"}
 
 
 
 class PP_OT_Arch_RenderMeta_On(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Render active meta strip'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.meton"
@@ -214,7 +210,7 @@ class PP_OT_Arch_RenderMeta_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderMeta_Off(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Handle the insides of the active metastrip. Don't render'''
 
     bl_label = "Switch Off Render Inside for Active"
     bl_idname = "varch.metoff"
@@ -245,7 +241,7 @@ class PP_OT_Arch_RenderMeta_Off(bpy.types.Operator):
     
 
 class PP_OT_Arch_RenderImage_On(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Render image strips'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.imgon"
@@ -267,7 +263,7 @@ class PP_OT_Arch_RenderImage_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderImage_Off(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Copy image source files'''
 
     bl_label = "Switch Off Render Inside for Active"
     bl_idname = "varch.imgoff"
@@ -297,7 +293,7 @@ class PP_OT_Arch_RenderImage_Off(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderImgSeq_On(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Render image sequence strips'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.imgseqon"
@@ -319,7 +315,7 @@ class PP_OT_Arch_RenderImgSeq_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderImgSeq_Off(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Copy image sequence strips source files'''
 
     bl_label = "Switch Off Render Inside for Active"
     bl_idname = "varch.imgseqoff"
@@ -336,9 +332,7 @@ class PP_OT_Arch_RenderImgSeq_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_imagesequence = False
-            
-            
-        
+
         
         return{"FINISHED"}
     
@@ -346,7 +340,7 @@ class PP_OT_Arch_RenderImgSeq_Off(bpy.types.Operator):
 #------------------
 
 class PP_OT_Arch_RenderScene_On(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Render scene strips'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.scnon"
@@ -368,9 +362,9 @@ class PP_OT_Arch_RenderScene_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderScene_Off(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Ignore Scene Strips. Sources might get copied via blend data!?'''
 
-    bl_label = "Switch Off Render Inside for Active"
+    bl_label = "Ignore Scene Strip"
     bl_idname = "varch.scnoff"
     bl_options = {'REGISTER', "UNDO"}
 
@@ -392,7 +386,7 @@ class PP_OT_Arch_RenderScene_Off(bpy.types.Operator):
 #------------------
 
 class PP_OT_Arch_RenderSound_On(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Render audio strips (as videofiles :-( )'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.soundon"
@@ -400,7 +394,7 @@ class PP_OT_Arch_RenderSound_On(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        arch_props = context.scene.vse_archiver
+        
         return True
 
     def execute(self, context):
@@ -414,7 +408,7 @@ class PP_OT_Arch_RenderSound_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderSound_Off(bpy.types.Operator):
-    '''Update Metastrip list'''
+    '''Copy source files of the Audio'''
 
     bl_label = "Switch Off Render Inside for Active"
     bl_idname = "varch.soundoff"
@@ -423,25 +417,20 @@ class PP_OT_Arch_RenderSound_Off(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         
-        arch_props = context.scene.vse_archiver
-      
         return True
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_sound = False
-            
-            
-        
-        
+     
         return{"FINISHED"}
     
     
 #------------------
 
 class PP_OT_Arch_RenderGMeta_On(bpy.types.Operator):
-    '''Switch General Meta Rendering On'''
+    '''Render meta strips'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.gmetaon"
@@ -463,7 +452,7 @@ class PP_OT_Arch_RenderGMeta_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderGMeta_Off(bpy.types.Operator):
-    '''Switch General Meta Rendering Off'''
+    '''Handle the insides of Metastrips. Don't render'''
 
     bl_label = "Switch Off Render Inside for Active"
     bl_idname = "varch.gmetaoff"
@@ -472,7 +461,7 @@ class PP_OT_Arch_RenderGMeta_Off(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         
-        arch_props = context.scene.vse_archiver
+        
       
         return True
 
@@ -490,7 +479,7 @@ class PP_OT_Arch_RenderGMeta_Off(bpy.types.Operator):
 #------------------
 
 class PP_OT_Arch_RenderMovie_On(bpy.types.Operator):
-    '''Switch Movie to Render'''
+    '''Render movie strips'''
 
     bl_label = "Switch On Render Inside for Active"
     bl_idname = "varch.movieon"
@@ -512,7 +501,7 @@ class PP_OT_Arch_RenderMovie_On(bpy.types.Operator):
 
 
 class PP_OT_Arch_RenderMovie_Off(bpy.types.Operator):
-    '''Switch Movie to Copy'''
+    '''Copy source files of movie strips'''
 
     bl_label = "Switch Off Render Inside for Active"
     bl_idname = "varch.movieoff"

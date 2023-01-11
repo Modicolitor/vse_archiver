@@ -91,9 +91,9 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                         row.operator("varch.imgoff",
                                     icon="PINNED", text="Render", depress=True)
                     else:
-                        row.operator("varch.imgon",
-                                    icon="UNPINNED", text="Copy", depress=True)
                         row.operator("varch.imgoff",
+                                    icon="UNPINNED", text="Copy", depress=True)
+                        row.operator("varch.imgon",
                                     icon="PINNED", text="Render", depress=False)
                     
                     row = box.row()

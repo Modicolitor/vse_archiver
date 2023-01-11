@@ -59,6 +59,8 @@ Features
 [] ignore hiden strips option (I think he ignores them at the moment)
 [] back to original scene after snippets
 [] Decide rendering either with or without effect strips (at least a problem with time stretch)
+[] render real audio files like mp3
+
 
 [] warn if the rendersettings is set to an image format
 
