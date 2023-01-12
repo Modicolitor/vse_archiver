@@ -40,8 +40,11 @@ Todo
     [+] polls for operators: not updated, no target path
     [+] initialis updates data 
 
-    [] weird path error catching
-    [] handle unavailable strips
+    [+] weird path error catching
+    [+] handle unavailable strips
+
+    []is archiv for all 
+    []end at scene you started from
 
     [ ] Beschreibung Settings by type operators 
     [+] targetpath bug in löschen tuple geschachtelt

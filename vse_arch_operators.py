@@ -547,3 +547,23 @@ class PP_OT_Arch_RemoveArchivetag(bpy.types.Operator):
         
         
         return{"FINISHED"}
+
+
+
+class PP_OT_Arch_TestButton(bpy.types.Operator):
+    '''Test Button'''
+
+    bl_label = "Test"
+    bl_idname = "varch.tester"
+    bl_options = {'REGISTER', "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+
+        return True
+
+    def execute(self, context):
+        from .vse_arch_functions import write_texteditor
+        write_texteditor(context,['hallo', 'world', 'error copying files'])
+
+        return{"FINISHED"}

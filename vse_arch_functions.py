@@ -333,8 +333,9 @@ def collect_originals(context):
 
     
     
-    copy_files(filepathes)
-
+    errorlist = copy_files(filepathes)
+    if len(errorlist) != 0:
+        write_texteditor(context, errorlist)
 
     if arch_props.rebuild:
         build_blend_from_original(context, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
@@ -342,17 +343,22 @@ def collect_originals(context):
 def copy_files(filepathes):
     print(f'filepathes before copying:  ' )
     #easy read print
-    for d in filepathes:
-        print(f' {d} : {filepathes[d]} ')
+    #for d in filepathes:
+    #    print(f' {d} : {filepathes[d]} ')
     ###
-    
+    errorlist = []
     for srcpath in filepathes.items():
         if srcpath[0] != srcpath[1]:
             targetpath, basename = split_filepath(srcpath[1])
             os.makedirs(targetpath, exist_ok=True)
-            copy_file(srcpath[0], targetpath)
+            try:
+                copy_file(srcpath[0], targetpath)
+            except:
+                errorlist.append(f'Error copying from {srcpath[0]} to {targetpath}. Probably source file missing or no writing rights.')
         else:
             print(f'ignored copying file {srcpath[0]}; target path equals sourcepath ')
+            
+    return errorlist
 
 def collect_moviclips(context, filepathes, vid_directories):
     data = bpy.data 
@@ -1150,3 +1156,21 @@ def set_keyframes(scene, path, target,  value, frame):
     path.keyframe_insert(data_path=target)
 
     scene.frame_current = oriframe
+    
+
+def open_txt_editor(context,txt):
+    context.area.type = 'TEXT_EDITOR'
+
+    context.area.spaces[0].text = txt # make loaded text file visible
+    
+def write_texteditor(context,contentlist):
+
+    #make log file
+    txt = bpy.data.texts.new(name='VSE_Archiver_log')
+    
+    for txtelement in contentlist:
+        txt.write(txtelement + '\n')
+        
+    ##
+    open_txt_editor(context, txt)
+    

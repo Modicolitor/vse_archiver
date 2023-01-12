@@ -243,6 +243,9 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                         subcol.label(text="FFMpeg Video is recommended!")
                     if no_audio:
                         subcol.label(text="Audio rendering is disabled!")
+                        
+                        
+                    #subcol.operator('varch.tester')
 
         else:
 
