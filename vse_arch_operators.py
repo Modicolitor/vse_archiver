@@ -3,7 +3,7 @@ import bpy
 from .vse_arch_properties import VSE_Archiver_PropGroup
 from .vse_arch_functions import collect_originals, collect_snippets, update_metastrips, reset_metastrips, update_sequences_data, reset_sequences_data, get_seqdata_from_seq, get_metadata_from_seq
 
-from .vse_arch_functions import  has_equal_sequences, has_equal_metas
+from .vse_arch_functions import  has_equal_sequences, has_equal_metas, check_rendersettings
 
 
 def is_everythingpoll(context):
@@ -16,10 +16,15 @@ def is_everythingpoll(context):
         if not has_equal_sequences(context) or not has_equal_metas(context):
             needsupd = False
         if context.scene.vse_archiver.target_folder == '': 
-            needs_target = False 
+            needs_target = False
+        is_image, not_ffmpeg, no_audio = check_rendersettings(context)
+        
+        if is_image:
+            if context.scene.vse_archiver.render_imag_output:
+                is_image = False
         
         print(f'needsupd {needs_target}  needs_target {needs_target}')
-        return needsupd and needs_target
+        return needsupd and needs_target and not is_image
     return False
 
     

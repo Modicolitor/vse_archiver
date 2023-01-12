@@ -1,6 +1,6 @@
 import bpy
 from .vse_arch_functions import get_sequence_type, print_list, get_seq_render_tag
-from .vse_arch_functions import  has_equal_sequences, has_equal_metas
+from .vse_arch_functions import  has_equal_sequences, has_equal_metas, check_rendersettings, is_target_equ_source
 
 
 
@@ -53,11 +53,19 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if context.scene.vse_archiver.target_folder != '':
                         has_targetpath = True
 
-                    if not has_targetpath:
+                    same_dir = is_target_equ_source(context)
+                    
+                    if not has_targetpath or same_dir:
                         subcol =  col.box() 
                         subcol.label(text="Warning")
+                    
+                    if not has_targetpath:
+                        #subcol =  col.box() 
+                        #subcol.label(text="Warning")
                         subcol.label(text="No Target Folder selected!")
                     
+                    if same_dir:
+                        subcol.label(text="Target and Blendfile have the same path. Blend will be overwriten.")
                 
                 if arch_props.mode == '2':
                     subcol.prop(arch_props, "remove_fade", text = 'Full opacity during render')
@@ -227,24 +235,32 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     is_image, not_ffmpeg, no_audio = check_rendersettings(context)
                     has_equal_seq = has_equal_sequences(context)
                     has_equal_met = has_equal_metas(context)
+                    same_dir = is_target_equ_source(context)
                     
-                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met:
+                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met or same_dir:
                         subcol =  col.box() 
-                        subcol.label(text="Warning")
+                        #subcol.alignment = 'CENTER'
+                        subcol.label(text="Warning!!")
                     if context.scene.vse_archiver.target_folder == '': #or context.scene.vse_archiver.target_folder == None
                         subcol.label(text="No Target Folder selected!")
+                    if same_dir:
+                        subcol.label(text="Target and Blendfile have the same path. Blend will be overwriten.")
+                    
                     if not has_equal_seq or not has_equal_met:
                         subcol.label(text="Update Data!")
                     
-                    
                     if is_image:
                         subcol.label(text="Imageformat selected for render!")
+                        #subcol.prop(arch_props, 'render_imag_output', expand = True )
                     if not_ffmpeg:
                         subcol.label(text="FFMpeg Video is recommended!")
                     if no_audio:
                         subcol.label(text="Audio rendering is disabled!")
                         
                         
+                    if is_image:
+                        subcol =  col.box()
+                        subcol.prop(arch_props, 'render_imag_output')
                     #subcol.operator('varch.tester')
 
         else:
@@ -253,22 +269,3 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                             icon="PLUS")
             
             
-def check_rendersettings(context):
-    is_image = True
-    not_ffmpeg = True
-    no_audio = False
-    
-    
-    #videoformats = ['FFMPEG', 'AVI_RAW', 'AVI_JPEG']
-    
-    #print(f'{context.scene.render.image_settings.file_format == 'FFMPEG'}')
-    file_format = context.scene.render.image_settings.file_format
-    if file_format == 'FFMPEG' or file_format == 'AVI_RAW' or file_format == 'AVI_JPEG':
-        is_image = False
-    if file_format == 'FFMPEG':
-        not_ffmpeg = False
-    if context.scene.render.ffmpeg.audio_codec == 'NONE' or not_ffmpeg == True:
-        no_audio = True
-
-    
-    return is_image, not_ffmpeg, no_audio

@@ -79,7 +79,8 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
                #('3', 'Collect Blend Elements', ''),
                ]
     )
-    
+    render_imag_output: bpy.props.BoolProperty(
+        name="Render as images anyway", default=False, description='Overwrite blocking of rendering into image sequences (see renderoutput)')
     
     #sequences:bpy.props.CollectionProperty(type=VSE_Archiver_SequenceStrip)
 

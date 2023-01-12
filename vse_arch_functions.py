@@ -46,6 +46,32 @@ def has_equal_sequences(context):
 
     return c == arch_count
 
+def check_rendersettings(context):
+    is_image = True
+    not_ffmpeg = True
+    no_audio = False
+    
+    
+    #videoformats = ['FFMPEG', 'AVI_RAW', 'AVI_JPEG']
+    
+    #print(f'{context.scene.render.image_settings.file_format == 'FFMPEG'}')
+    file_format = context.scene.render.image_settings.file_format
+    if file_format == 'FFMPEG' or file_format == 'AVI_RAW' or file_format == 'AVI_JPEG':
+        is_image = False
+    if file_format == 'FFMPEG':
+        not_ffmpeg = False
+    if context.scene.render.ffmpeg.audio_codec == 'NONE' or not_ffmpeg == True:
+        no_audio = True
+
+    
+    return is_image, not_ffmpeg, no_audio
+
+def is_target_equ_source(context):
+    target_folder = context.scene.vse_archiver.target_folder
+    #blend_path = 
+    
+    return bpy.path.abspath('//') == bpy.path.abspath(target_folder)
+    
 def get_video_target_path(context, filepath, vid_directories):
     #print(f'In get video path filepath {filepath} directory {directory} vid_directories {vid_directories} ')
     arch_props = context.scene.vse_archiver
@@ -53,7 +79,7 @@ def get_video_target_path(context, filepath, vid_directories):
     videofolder = arch_props.target_video_folder
     
     directory, basename = split_filepath(filepath)
-    print(f'audio target path beginning dir {directory} basename {basename}')
+    #print(f'audio target path beginning dir {directory} basename {basename}')
     #'target_folder'\videofolder\basename 
     targetpath = os.path.join(targetfolder, videofolder)
     
@@ -72,10 +98,10 @@ def get_video_target_path(context, filepath, vid_directories):
         subfoldername = subfoldername + "_" + str(n)
         targetpath = os.path.join(targetpath, subfoldername)
         video_targetpath = os.path.join(targetpath, basename)
-        print(f'new in vid folder path {filepath} aud target path {video_targetpath}')
+        #print(f'new in vid folder path {filepath} aud target path {video_targetpath}')
         
     vid_directories[directory] = targetpath
-    print(f'after processing {filepath} vid_directories {vid_directories}')
+    #print(f'after processing {filepath} vid_directories {vid_directories}')
     return video_targetpath, vid_directories
     
 
@@ -469,7 +495,9 @@ def build_blend_from_original(context, filepathes, imgseq_directories, vid_direc
     arch_props = context.scene.vse_archiver
     #save as new blend in the folder 
     save_blend_file(context)
-    arch_props.is_archiv = True
+    for sc in bpy.data.scenes:
+        sc.vse_archiver.is_archiv = True
+        
     sequences = context.scene.sequence_editor.sequences_all
     #pro sequence, strip filename from path, add filename to target folder path and replace filepath in sequence
     
@@ -518,7 +546,7 @@ def collect_snippets(context):
     #print(d)
     homogenous_addon_settings_over_scene(context)
     set_rendersettings(context)
-    
+    oriscenename = copy.copy(context.window.scene.name)
     
     
     #  gehe durch sequences
@@ -541,7 +569,8 @@ def collect_snippets(context):
             all_vis_seqs.extend(new_seqs)
             set_sequences_visibility(all_vis_seqs, scene)
     
-    
+    #go to original scene
+    context.window.scene = bpy.data.scenes[oriscenename]
     
     if arch_props.use_blend_data:
         filepathes, audio_directories, vid_directories = collect_sounds(context, filepathes, audio_directories, vid_directories) 

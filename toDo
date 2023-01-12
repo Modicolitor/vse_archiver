@@ -43,10 +43,11 @@ Todo
     [+] weird path error catching
     [+] handle unavailable strips
 
-    []is archiv for all 
-    []end at scene you started from
-
-    [ ] Beschreibung Settings by type operators 
+    [+]is archiv for all scenes
+    [+]end at scene you started from
+    [] same input as blender file, blend file will be overwriten
+    
+    [+] Beschreibung Settings by type operators 
     [+] targetpath bug in löschen tuple geschachtelt
     [+] scene sequence ignore or render individual
     [+] use scene render settings of active scene (and copy to the other scenes?)
@@ -64,6 +65,7 @@ Features
 [] Decide rendering either with or without effect strips (at least a problem with time stretch)
 [] render real audio files like mp3
 
+[] image rendering as output not allowed because of rebuilding feature, coud be added (with check box )
 
 [] warn if the rendersettings is set to an image format
 
