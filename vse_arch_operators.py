@@ -3,7 +3,7 @@ import bpy
 from .vse_arch_properties import VSE_Archiver_PropGroup
 from .vse_arch_functions import collect_originals, collect_snippets, update_metastrips, reset_metastrips, update_sequences_data, reset_sequences_data, get_seqdata_from_seq, get_metadata_from_seq
 
-from .vse_arch_functions import  has_equal_sequences, has_equal_metas, check_rendersettings
+from .vse_arch_functions import  has_equal_sequences, has_equal_metas, check_rendersettings, reset_seq_by_type
 
 
 def is_everythingpoll(context):
@@ -17,13 +17,13 @@ def is_everythingpoll(context):
             needsupd = False
         if context.scene.vse_archiver.target_folder == '': 
             needs_target = False
-        is_image, not_ffmpeg, no_audio = check_rendersettings(context)
+        is_image, not_ffmpeg, no_audio, no_videocodec = check_rendersettings(context)
         
         if is_image:
             if context.scene.vse_archiver.render_imag_output:
                 is_image = False
         
-        print(f'needsupd {needs_target}  needs_target {needs_target}')
+        #print(f'needsupd {needs_target}  needs_target {needs_target}')
         return needsupd and needs_target and not is_image
     return False
 
@@ -162,7 +162,7 @@ class PP_OT_Arch_RenderSeq_On(bpy.types.Operator):
         if active != None:
             seqdata = get_seqdata_from_seq(context, active)
             seqdata.pls_render = True
-        
+
         return{"FINISHED"}
 
 
@@ -209,7 +209,7 @@ class PP_OT_Arch_RenderMeta_On(bpy.types.Operator):
         if active != None:
             seqdata = get_metadata_from_seq(context, active)
             seqdata.render_inside = True
-        
+
         
         return{"FINISHED"}
 
@@ -242,7 +242,7 @@ class PP_OT_Arch_RenderMeta_Off(bpy.types.Operator):
     
     
     #-------------------------------------------------
-    
+    #type switches 
     
 
 class PP_OT_Arch_RenderImage_On(bpy.types.Operator):
@@ -262,7 +262,7 @@ class PP_OT_Arch_RenderImage_On(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_image = True
-        
+            reset_seq_by_type(context, 'IMAGE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
 
@@ -287,7 +287,7 @@ class PP_OT_Arch_RenderImage_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_image = False
-        
+            reset_seq_by_type(context, 'IMAGE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
     
@@ -315,7 +315,7 @@ class PP_OT_Arch_RenderImgSeq_On(bpy.types.Operator):
             archiver = context.scene.vse_archiver
             archiver.render_imagesequence = True
         
-        
+            reset_seq_by_type(context, 'IMGSEQ') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
 
 
@@ -337,7 +337,7 @@ class PP_OT_Arch_RenderImgSeq_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_imagesequence = False
-
+            reset_seq_by_type(context, 'IMGSEQ') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
     
@@ -361,7 +361,7 @@ class PP_OT_Arch_RenderScene_On(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_scenestrip = True
-        
+            reset_seq_by_type(context, 'SCENE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
 
@@ -384,7 +384,7 @@ class PP_OT_Arch_RenderScene_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_scenestrip = False
-       
+            reset_seq_by_type(context, 'SCENE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
     
     
@@ -408,7 +408,7 @@ class PP_OT_Arch_RenderSound_On(bpy.types.Operator):
             archiver = context.scene.vse_archiver
             archiver.render_sound = True
         
-        
+            reset_seq_by_type(context, 'SOUND') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
 
 
@@ -428,7 +428,7 @@ class PP_OT_Arch_RenderSound_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_sound = False
-     
+            reset_seq_by_type(context, 'SOUND') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
     
     
@@ -451,7 +451,7 @@ class PP_OT_Arch_RenderGMeta_On(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_metastrip= True
-        
+            reset_seq_by_type(context, 'META') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
 
@@ -474,7 +474,7 @@ class PP_OT_Arch_RenderGMeta_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_metastrip = False
-            
+            reset_seq_by_type(context, 'META') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
             
         
         
@@ -500,7 +500,7 @@ class PP_OT_Arch_RenderMovie_On(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_movie = True
-        
+            reset_seq_by_type(context, 'MOVIE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
 
@@ -523,7 +523,7 @@ class PP_OT_Arch_RenderMovie_Off(bpy.types.Operator):
         if hasattr(context.scene, 'vse_archiver'):
             archiver = context.scene.vse_archiver
             archiver.render_movie = False
-            
+            reset_seq_by_type(context, 'MOVIE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
             
         
         

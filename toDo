@@ -37,6 +37,13 @@ Copy original:
     [] test scene render stuff
 
 Todo
+    
+    [] check copy_or_render( for order individual before type settings) 
+    [] scene returns "copy" check if scenes render inside
+    
+    
+    [] img and imgsequence not unterschieden
+    
     [+] polls for operators: not updated, no target path
     [+] initialis updates data 
 
@@ -45,7 +52,7 @@ Todo
 
     [+]is archiv for all scenes
     [+]end at scene you started from
-    [] same input as blender file, blend file will be overwriten
+    [+] warning: same input as blender file, blend file will be overwriten
     
     [+] Beschreibung Settings by type operators 
     [+] targetpath bug in löschen tuple geschachtelt
@@ -59,6 +66,9 @@ Todo
 
 Features 
 ????[] add frames to bgeinning and end of the sequences (scheint anstrengend wenn man kurz drüber nachdenkt)
+
+[] related audio and movie zusammenrendern
+[] fortschrittsbalken
 
 [] ignore hiden strips option (I think he ignores them at the moment)
 [] back to original scene after snippets

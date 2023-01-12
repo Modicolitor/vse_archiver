@@ -95,12 +95,12 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if arch_props.render_image:
                                 
                         row.operator("varch.imgoff",
-                                    icon="UNPINNED", text="Copy", depress=False)
+                                    icon="UNPINNED", text=" Copy ", depress=False)
                         row.operator("varch.imgoff",
                                     icon="PINNED", text="Render", depress=True)
                     else:
                         row.operator("varch.imgoff",
-                                    icon="UNPINNED", text="Copy", depress=True)
+                                    icon="UNPINNED", text=" Copy ", depress=True)
                         row.operator("varch.imgon",
                                     icon="PINNED", text="Render", depress=False)
                     
@@ -109,12 +109,12 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if arch_props.render_imagesequence:
                                 
                         row.operator("varch.imgseqoff",
-                                    icon="UNPINNED", text="Copy", depress=False)
+                                    icon="UNPINNED", text=" Copy ", depress=False)
                         row.operator("varch.imgseqon",
                                     icon="PINNED", text="Render", depress=True)
                     else:
                         row.operator("varch.imgseqoff",
-                                    icon="UNPINNED", text="Copy", depress=True)
+                                    icon="UNPINNED", text=" Copy ", depress=True)
                         row.operator("varch.imgseqon",
                                     icon="PINNED", text="Render", depress=False)
                     
@@ -123,12 +123,12 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if arch_props.render_movie:
                                 
                         row.operator("varch.movieoff",
-                                    icon="UNPINNED", text="Copy", depress=False)
+                                    icon="UNPINNED", text=" Copy ", depress=False)
                         row.operator("varch.movieon",
                                     icon="PINNED", text="Render", depress=True)
                     else:
                         row.operator("varch.movieoff",
-                                    icon="UNPINNED", text="Copy", depress=True)
+                                    icon="UNPINNED", text=" Copy ", depress=True)
                         row.operator("varch.movieon",
                                     icon="PINNED", text="Render", depress=False)   
                         
@@ -138,12 +138,12 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if arch_props.render_sound:
                                 
                         row.operator("varch.soundoff",
-                                    icon="UNPINNED", text="Copy", depress=False)
+                                    icon="UNPINNED", text=" Copy ", depress=False)
                         row.operator("varch.soundon",
                                     icon="PINNED", text="Render", depress=True)
                     else:
                         row.operator("varch.soundoff",
-                                    icon="UNPINNED", text="Copy", depress=True)
+                                    icon="UNPINNED", text=" Copy ", depress=True)
                         row.operator("varch.soundon",
                                     icon="PINNED", text="Render", depress=False)
                     
@@ -154,12 +154,12 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     if arch_props.render_metastrip:
                                 
                         row.operator("varch.gmetaoff",
-                                    icon="UNPINNED", text="Inside", depress=False)
+                                    icon="UNPINNED", text=" Inside ", depress=False)
                         row.operator("varch.gmetaon",
                                     icon="PINNED", text="Render", depress=True)
                     else:
                         row.operator("varch.gmetaoff",
-                                    icon="UNPINNED", text="Inside", depress=True)
+                                    icon="UNPINNED", text=" Inside ", depress=True)
                         row.operator("varch.gmetaon",
                                     icon="PINNED", text="Render", depress=False)
                     
@@ -193,16 +193,14 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                             #subcol.prop(arch_props.metastrips[active.name], "render_inside")
                             if get_seq_render_tag(context.scene, active):
                                     row.operator("varch.meton",
-                                                icon="PINNED", text="Use Inside", depress=True)
+                                                icon="UNPINNED", text="Use Inside", depress=True)
                                     row.operator("varch.metoff",
-                                                icon="UNPINNED", text="Render", depress=False)
-                                    
-                                    
+                                                icon="PINNED", text="Render", depress=False)
                             else:
                                 row.operator("varch.meton",
-                                            icon="PINNED", text="Use Inside", depress=False)
+                                            icon="UNPINNED", text="Use Inside", depress=False)
                                 row.operator("varch.metoff",
-                                            icon="UNPINNED", text="Render", depress=True)
+                                            icon="PINNED", text="Render", depress=True)
                                 
                         
                         if active.name in arch_props.sequences:
@@ -232,12 +230,12 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     
                     
                     #####WARNING####
-                    is_image, not_ffmpeg, no_audio = check_rendersettings(context)
+                    is_image, not_ffmpeg, no_audio, no_videocodec = check_rendersettings(context)
                     has_equal_seq = has_equal_sequences(context)
                     has_equal_met = has_equal_metas(context)
                     same_dir = is_target_equ_source(context)
                     
-                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met or same_dir:
+                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met or same_dir or no_videocodec:
                         subcol =  col.box() 
                         #subcol.alignment = 'CENTER'
                         subcol.label(text="Warning!!")
@@ -254,6 +252,8 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                         #subcol.prop(arch_props, 'render_imag_output', expand = True )
                     if not_ffmpeg:
                         subcol.label(text="FFMpeg Video is recommended!")
+                    if no_videocodec:
+                        subcol.label(text="Video rendering is disabled!")
                     if no_audio:
                         subcol.label(text="Audio rendering is disabled!")
                         

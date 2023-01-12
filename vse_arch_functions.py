@@ -50,7 +50,7 @@ def check_rendersettings(context):
     is_image = True
     not_ffmpeg = True
     no_audio = False
-    
+    no_videocodec = False
     
     #videoformats = ['FFMPEG', 'AVI_RAW', 'AVI_JPEG']
     
@@ -62,9 +62,10 @@ def check_rendersettings(context):
         not_ffmpeg = False
     if context.scene.render.ffmpeg.audio_codec == 'NONE' or not_ffmpeg == True:
         no_audio = True
-
+    if bpy.data.scenes["Scene"].render.ffmpeg.codec == 'NONE':
+        no_videocodec = True
     
-    return is_image, not_ffmpeg, no_audio
+    return is_image, not_ffmpeg, no_audio, no_videocodec
 
 def is_target_equ_source(context):
     target_folder = context.scene.vse_archiver.target_folder
@@ -558,6 +559,7 @@ def collect_snippets(context):
             
             
             sequences = get_visible_sequences(scene)#  scene.sequence_editor.sequences_all)
+            
             #in cases user is in metastrip
             find_toplevel(context, scene, context.sequences)
             #print(bb)
@@ -609,8 +611,11 @@ def homogenous_addon_settings_over_scene(context):
         va.use_blend_data = context.scene.vse_archiver.use_blend_data
                 
 def copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories):
+    percent = len(sequences)/100
+    context.window_manager.progress_begin(0,100)
     new_seqs=[]
-    for seq in sequences[:]:
+    for n,seq in enumerate(sequences[:]):
+        context.window_manager.progress_update(n*percent)
         answer = copy_or_render(context, scene, seq)
         print(f'for seq {seq.name} got answer {answer}')
         if answer == 'COPY':
@@ -625,7 +630,8 @@ def copy_render_decider(context, scene, filepathes, imgseq_directories, sequence
             print(f'ignored sequence {seq.name}')
         else:
             print(f'weird answer {answer}')
-            
+    
+    context.window_manager.progress_end()
     print(f'after copy_render_decider new seqs {new_seqs}')
     return filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs
                 
@@ -857,26 +863,27 @@ def copy_or_render(context, scene, seq):
     
     if type == 'IMAGE':
         #print(f'found image {seq.name} render_image {arch_props.render_image}')
-        if arch_props.render_image and get_seq_render_tag(scene, seq):
+        if get_seq_render_tag(scene, seq): #arch_props.render_image and
             return 'RENDER'
         else:
             return 'COPY'
     
     if type == 'IMGSEQ':
         #print(f'found Imgseq {seq.name} render_imageseq {arch_props.render_imagesequence}')
-        if arch_props.render_imagesequence and get_seq_render_tag(scene, seq):
+        if get_seq_render_tag(scene, seq):
             return 'RENDER'
         else:
             return 'COPY'        
 
     if type == 'SCENE':
         #print(f'found scene {seq.name} render_scenestrip {arch_props.render_scenestrip}')
-        if arch_props.render_scenestrip:
+        if get_seq_render_tag(scene, seq):
             return 'RENDER'
         else:
             return 'COPY'
+        
     if type =='SOUND':
-        if arch_props.render_sound and get_seq_render_tag(scene, seq):
+        if get_seq_render_tag(scene, seq): #arch_props.render_sound and 
             return 'RENDER'
         else:
             return 'COPY'
@@ -884,7 +891,7 @@ def copy_or_render(context, scene, seq):
         return 'META'
 
     if type == 'MOVIE':
-        if arch_props.render_movie and get_seq_render_tag(scene, seq): 
+        if get_seq_render_tag(scene, seq):  #arch_props.render_movie and
             return 'RENDER'
         else:
             return 'COPY'
@@ -1004,6 +1011,31 @@ def reset_sequences_data(context):
     
     update_sequences_data(context)
 
+##resets all sequence data for a specific type
+def reset_seq_by_type(context, type):
+    vse_archiver = context.scene.vse_archiver
+    if type != 'META':
+        seqs = context.scene.vse_archiver.sequences
+        
+        for seq in seqs:
+            if seq.type == type:
+                if type == 'MOVIE':
+                    seq.pls_render = vse_archiver.render_movie
+                elif type == 'SOUND':
+                    seq.pls_render = vse_archiver.render_sound
+                elif type == 'IMAGE':
+                    seq.pls_render = vse_archiver.render_image
+                elif type == 'IMGSEQ':
+                    seq.pls_render = vse_archiver.render_imagesequence
+                elif type == 'SCENE':
+                    seq.pls_render = vse_archiver.render_scenestrip
+    else:
+        seqs = context.scene.vse_archiver.metastrips
+        for seq in seqs:
+            if seq.type == 'META':
+                seq.render_inside = not vse_archiver.render_metastrip
+
+
 ####adds metastrips that are not present yet in the list ; renaming strips,  after making   
 def update_sequences_data(context):
     print('in update sequences') 
@@ -1023,6 +1055,7 @@ def update_sequences_data(context):
                     print(f'ele {seq.name} ')
                     ele = arch_sequences.add()
                     ele.name = seq.name 
+                    ele.type = type
                     if type == 'MOVIE':
                         ele.pls_render = vse_archiver.render_movie
                     elif type == 'SOUND':
@@ -1075,7 +1108,7 @@ def get_attr_from_string(scene, txt):
      
     scan = False
     for n, t in enumerate(txt):
-        print(t)
+        #print(t)
         ##ignore strings 
         if t == "'" or t == '"':
             if not scan:

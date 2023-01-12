@@ -4,12 +4,16 @@ import bpy
 class VSE_Archiver_SequenceStrip(bpy.types.PropertyGroup):
     name:bpy.props.StringProperty(
         name="Video Folder Name", default = 'Video')
+    type:bpy.props.StringProperty(
+        name="seqType", default = '')
     pls_render:bpy.props.BoolProperty(
         name="Render Sequence", default=False)
     
 class VSE_Archiver_MetaStrip(bpy.types.PropertyGroup):
     name:bpy.props.StringProperty(
-        name="Video Folder Name", default = 'Video')
+        name="Meta Name", default = 'Meta')
+    type:bpy.props.StringProperty(
+        name="seqType", default = 'META')
     render_inside:bpy.props.BoolProperty(
         name="Render Inside", default=False)
     
