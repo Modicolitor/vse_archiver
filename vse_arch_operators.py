@@ -9,7 +9,7 @@ from .vse_arch_functions import  has_equal_sequences, has_equal_metas, check_ren
 def is_everythingpoll(context):
     has_props= hasattr(context.scene, 'vse_archiver')
     #return False
-    print('test')
+    #print('test')
     if has_props:
         needsupd = True
         needs_target = True
