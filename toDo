@@ -41,22 +41,23 @@ Todo
     [+] check copy_or_render( for order individual before type settings) 
     [+] output back to beginning --> [] test
     
-    [+] scene returns "copy" check if scenes render inside
     
-    [+] meta,scene snippets rendered without audio --> replacing metastrip requires to add the audio strip, too --> overlapping?
     
     [Problem?] doesn't report error for missing files inside of metafiles
     
     
 
     [ ] render.image_settings.color_depth
-    [] settings by type not shared over scenes 
+    [+] settings by type not shared over scenes 
 
     [] fade on metastrips lost when render inside
     
     [] negativ frames 
+    
     [+] error message scrolled to the beginning
     [+]794 renderpath = renderpath + '.mp4'
+    [+] scene returns "copy" check if scenes render inside
+    [+] meta,scene snippets rendered without audio --> replacing metastrip with metastrip with the move and audio strip
 
     [+] polls for operators: not updated, no target path
     [+] initialis updates data 

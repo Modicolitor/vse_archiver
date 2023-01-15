@@ -260,8 +260,10 @@ class PP_OT_Arch_RenderImage_On(bpy.types.Operator):
     def execute(self, context):
         
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_image = True
+            #archiver = context.scene.vse_archiver
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_image = True
             reset_seq_by_type(context, 'IMAGE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
@@ -285,8 +287,10 @@ class PP_OT_Arch_RenderImage_Off(bpy.types.Operator):
         
         
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_image = False
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_image = False
+            
             reset_seq_by_type(context, 'IMAGE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
@@ -312,8 +316,10 @@ class PP_OT_Arch_RenderImgSeq_On(bpy.types.Operator):
     def execute(self, context):
 
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_imagesequence = True
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_imagesequence = True
+            
         
             reset_seq_by_type(context, 'IMGSEQ') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
@@ -335,8 +341,9 @@ class PP_OT_Arch_RenderImgSeq_Off(bpy.types.Operator):
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_imagesequence = False
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_imagesequence = False
             reset_seq_by_type(context, 'IMGSEQ') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
@@ -359,8 +366,10 @@ class PP_OT_Arch_RenderScene_On(bpy.types.Operator):
     def execute(self, context):
 
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_scenestrip = True
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_scenestrip = True
+            
             reset_seq_by_type(context, 'SCENE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
@@ -382,8 +391,9 @@ class PP_OT_Arch_RenderScene_Off(bpy.types.Operator):
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_scenestrip = False
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_scenestrip = False
             reset_seq_by_type(context, 'SCENE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
     
@@ -405,8 +415,10 @@ class PP_OT_Arch_RenderSound_On(bpy.types.Operator):
     def execute(self, context):
 
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_sound = True
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_sound = True
+            
         
             reset_seq_by_type(context, 'SOUND') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
@@ -426,8 +438,9 @@ class PP_OT_Arch_RenderSound_Off(bpy.types.Operator):
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_sound = False
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_sound = False
             reset_seq_by_type(context, 'SOUND') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         return{"FINISHED"}
     
@@ -449,8 +462,10 @@ class PP_OT_Arch_RenderGMeta_On(bpy.types.Operator):
     def execute(self, context):
 
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_metastrip= True
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_metastrip = True
+            
             reset_seq_by_type(context, 'META') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
@@ -465,15 +480,14 @@ class PP_OT_Arch_RenderGMeta_Off(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        
-        
-      
+
         return True
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_metastrip = False
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_metastrip = False
             reset_seq_by_type(context, 'META') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
             
         
@@ -498,8 +512,10 @@ class PP_OT_Arch_RenderMovie_On(bpy.types.Operator):
     def execute(self, context):
 
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_movie = True
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_movie = True
+            
             reset_seq_by_type(context, 'MOVIE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
         
         return{"FINISHED"}
@@ -521,8 +537,10 @@ class PP_OT_Arch_RenderMovie_Off(bpy.types.Operator):
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.render_movie = False
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.render_movie = False
+            
             reset_seq_by_type(context, 'MOVIE') #['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']
             
         
@@ -545,12 +563,9 @@ class PP_OT_Arch_RemoveArchivetag(bpy.types.Operator):
 
     def execute(self, context):
         if hasattr(context.scene, 'vse_archiver'):
-            archiver = context.scene.vse_archiver
-            archiver.is_archiv = False
-            
-            
-        
-        
+            for sc in bpy.data.scenes:
+                archiver = sc.vse_archiver
+                archiver.is_archiv = False
         return{"FINISHED"}
 
 

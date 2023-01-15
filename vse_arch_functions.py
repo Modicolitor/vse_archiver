@@ -1102,25 +1102,31 @@ def reset_sequences_data(context):
 def reset_seq_by_type(context, type):
     vse_archiver = context.scene.vse_archiver
     if type != 'META':
-        seqs = context.scene.vse_archiver.sequences
-        
-        for seq in seqs:
-            if seq.type == type:
-                if type == 'MOVIE':
-                    seq.pls_render = vse_archiver.render_movie
-                elif type == 'SOUND':
-                    seq.pls_render = vse_archiver.render_sound
-                elif type == 'IMAGE':
-                    seq.pls_render = vse_archiver.render_image
-                elif type == 'IMGSEQ':
-                    seq.pls_render = vse_archiver.render_imagesequence
-                elif type == 'SCENE':
-                    seq.pls_render = vse_archiver.render_scenestrip
+        for sc in bpy.data.scenes:
+            seqs = sc.vse_archiver.sequences
+            for seq in seqs:
+                if seq.type == type:
+                    if type == 'MOVIE':
+                        seq.pls_render = vse_archiver.render_movie
+                        #sc.vse_archiver.render_movie = vse_archiver.render_movie
+                    elif type == 'SOUND':
+                        seq.pls_render = vse_archiver.render_sound
+                        #sc.vse_archiver.render_sound = vse_archiver.render_sound
+                    elif type == 'IMAGE':
+                        seq.pls_render = vse_archiver.render_image
+                        #sc.vse_archiver.render_image = vse_archiver.render_image
+                    elif type == 'IMGSEQ':
+                        seq.pls_render = vse_archiver.render_imagesequence
+                        #sc.vse_archiver.render_imagesequence = vse_archiver.render_imagesequence
+                    elif type == 'SCENE':
+                        seq.pls_render = vse_archiver.render_scenestrip
+                        #sc.vse_archiver.render_scenestrip = vse_archiver.render_scenestrip
     else:
-        seqs = context.scene.vse_archiver.metastrips
-        for seq in seqs:
-            if seq.type == 'META':
-                seq.render_inside = not vse_archiver.render_metastrip
+        for sc in bpy.data.scenes:
+            seqs = sc.vse_archiver.metastrips
+            for seq in seqs:
+                if seq.type == 'META':
+                    seq.render_inside = not vse_archiver.render_metastrip
 
 
 ####adds metastrips that are not present yet in the list ; renaming strips,  after making   
