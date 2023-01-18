@@ -701,23 +701,29 @@ def get_effectstrip_cascade(seq, seqs):
 
 def set_vis_for_render(seqs, scene):
     #adjust for metastrip
+    print(f'seqs before everything {seqs}')
     for m_seq in seqs:
         #print(f'mseqs type {m_seq.type}')
         if m_seq.type == 'META':
-            seqs.extend(m_seq.sequences)
-            print(f'after metastrip in vis seqs {seqs} m_seq {m_seq.sequences}')
+            for se in m_seq.sequences:
+                if se.mute == False:
+                    print(se.name)
+                    seqs.append(se)
+            
     
     
     #find effect strips 
     for a_seq in scene.sequence_editor.sequences_all:
         seqs = get_effectstrip_cascade(a_seq, seqs)
+    print(f'seqs before parent {seqs}')
     
     #parent case sequence in meta --> vis meta true
     for p_seq in seqs:
         parent = p_seq.parent_meta()
         if parent != None: 
-            seqs.append(parent)
-    #print(f'seqs after effectstrip cascade {seqs}')
+            if parent.mute == False:###richtig???
+                seqs.append(parent)
+    print(f'seqs after effectstrip cascade {seqs}')
             
     #####don't set vis false when its a speed track or other effect strip 
     for sequ in scene.sequence_editor.sequences_all:
@@ -725,7 +731,7 @@ def set_vis_for_render(seqs, scene):
     for seq in seqs:    
         seq.mute = False
     #print('necessary seq muted')
-    #print(brak)
+    print(brak)
     
 def set_rendersettings(context):
     for sc in bpy.data.scenes:
@@ -745,8 +751,19 @@ def set_rendersettings(context):
         sc.render.ffmpeg.audio_volume = context.scene.render.ffmpeg.audio_volume
         
         sc.render.image_settings.color_mode = context.scene.render.image_settings.color_mode
-
-    
+        sc.render.image_settings.color_depth = context.scene.render.image_settings.color_depth
+        sc.render.image_settings.quality = context.scene.render.image_settings.quality
+        sc.render.image_settings.compression = context.scene.render.image_settings.compression
+        sc.render.image_settings.jpeg2k_codec = context.scene.render.image_settings.jpeg2k_codec
+        sc.render.image_settings.use_jpeg2k_cinema_preset = context.scene.render.image_settings.use_jpeg2k_cinema_preset
+        sc.render.image_settings.use_jpeg2k_cinema_48 = context.scene.render.image_settings.use_jpeg2k_cinema_48
+        sc.render.image_settings.use_jpeg2k_ycc = context.scene.render.image_settings.use_jpeg2k_ycc
+        sc.render.image_settings.exr_codec = context.scene.render.image_settings.exr_codec
+        sc.render.image_settings.use_zbuffer = context.scene.render.image_settings.use_zbuffer
+        sc.render.image_settings.use_preview = context.scene.render.image_settings.use_preview
+        sc.render.image_settings.tiff_codec = context.scene.render.image_settings.tiff_codec
+        
+        
 def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     arch_props = scene.vse_archiver
     #remember fade 
@@ -766,8 +783,8 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     
     
     #hide_all sequences but the active and effect
-    if not is_meta:
-        set_vis_for_render([seq], scene)
+    #if not is_meta:
+    set_vis_for_render([seq], scene)
     
     ###handle fade
     
@@ -803,7 +820,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     context.scene.render.filepath = renderpath
     
     #if seq.type == "META":
-    #print(bb)
+    print(bb)
     # render sequence 
     bpy.ops.render.render(animation=True)
 
@@ -812,8 +829,8 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     scene.frame_start = init_start
     scene.frame_end = init_end
     
-    if not is_meta:
-        set_sequences_visibility(ori_vis_seqs, scene)
+    #if not is_meta:
+    set_sequences_visibility(ori_vis_seqs, scene)
     
     if arch_props.rebuild:
         new_seqes = replace_sequence_w_rendered(context, scene, seq, renderpath)
@@ -1033,7 +1050,8 @@ def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid
         elements =[seq]
         for subseq in seq.sequences:
             if subseq not in elements:
-                elements.append(subseq)
+                if subseq.mute == False:
+                    elements.append(subseq)
         #elements.append(seq)
         
         #vis_seqs = get_visible_sequences(scene)

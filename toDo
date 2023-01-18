@@ -39,20 +39,18 @@ Copy original:
 Todo
     
     [+] check copy_or_render( for order individual before type settings) 
-    [+] output back to beginning --> [] test
-    
+    [+] output back to beginning --> [+] test
+    [+] settings by type not shared over scenes 
     
     
     [Problem?] doesn't report error for missing files inside of metafiles
     
-    
+    [] test visibility/mute of effekt strips
 
-    [ ] render.image_settings.color_depth
-    [+] settings by type not shared over scenes 
-
-    [] fade on metastrips lost when render inside
+    [+] render.image_settings.color_depthand more
+    [?????seems to work] fade on metastrips lost when render inside 
     
-    [] negativ frames 
+    [-] negativ frames 
     
     [+] error message scrolled to the beginning
     [+]794 renderpath = renderpath + '.mp4'
