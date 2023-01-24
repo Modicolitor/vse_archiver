@@ -1,7 +1,9 @@
 import bpy
 import os
+import json
 from .bl_archiver_properties import Bl_Archiver_PropGroup
 from pathlib import Path
+
 
 from .vse_arch_functions import collect_moviclips, collect_sounds,collect_images
 '''
@@ -34,6 +36,7 @@ all_filepathes = {"filepathes": {},
     "main_filepath": "",
     }
 
+#lädt mit jedem 
 @persistent
 def load_handler(context: bpy.context):#all_filepathes
     blends_to_check = all_filepathes['blends_to_check']
@@ -56,8 +59,9 @@ def load_handler(context: bpy.context):#all_filepathes
     
     
     own_filepath = bpy.path.abspath('//') # os.path.abspath(bpy.path.abspath('//'))
-    print(f'I"m subs own_filepath {own_filepath}')
-    print(f'blends to check in sub {blends_to_check}')
+    write_json()
+    #print(f'I"m subs own_filepath {own_filepath}')
+    #print(f'blends to check in sub {blends_to_check}')
     #if not bpy.context.scene.bl_archiver.is_main_file:
     if own_filepath in blends_to_check:
         bpy.ops.wm.window_close()
@@ -67,19 +71,21 @@ bpy.app.handlers.load_post.append(load_handler)
 
 
 
-def write_json(all_filepathes, json_filepath):
+def write_json():
         data = {}
-        data['rasps'] = []
-        for d in self.Rasplist:
+        data['ID'] = '669'
+        
+        
+        '''for d in self.Rasplist:
             data['rasps'].append({
                 'name': d.name,
                 'IP': d.IP,
                 'Songs': d.songs,
                 'description': d.description,
                 'is_video_pi': d.is_video_pi
-            })
+            })'''
 
-        with open('user_rasps.json', 'w') as outfile:
+        with open('C:\\Blender\\3.4\\scripts\\addons\\vse_archiver\\blend_archiver.json', 'w') as outfile:
             json.dump(data, outfile)
         print('I write json')
 

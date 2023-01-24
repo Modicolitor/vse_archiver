@@ -36,7 +36,7 @@ def has_equal_sequences(context):
     c = 0
     for sc in bpy.data.scenes:
         for s in sc.sequence_editor.sequences_all:
-            type = get_sequence_type(context, s)
+            type = get_sequence_type(s)
             if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']:
                 c += 1
                 
@@ -106,17 +106,7 @@ def get_video_target_path(context, filepath, vid_directories):
     return video_targetpath, vid_directories
     
 
-'''def has_vid_connected_audio(context, filepath):
-    
-    sequences = context.scene.sequence_editor.sequences_all
-    for seq in sequences:
-        typ =  get_sequence_type(context, seq)
-        if typ == 'MOVIE':
-            if seq.filepath == filepath:
-                print('******* found Audio with filepath {filepath} to originate from a video')
-                return True
-    print('*******NOT found Audio with filepath {filepath} to originate from a video')
-    return False'''
+
 
 def get_audio_target_path(context, filepath, audio_directories, video_directories): 
     arch_props = context.scene.vse_archiver
@@ -204,7 +194,7 @@ def get_imgseq_target_path(context, filename, directory, imgseq_directories):
 
     #'target_folder'maintarget\imgseqfolder\
     targetpath = os.path.join(targetfolder, imgseqfolder)
-    #print(f'in get target parth {filename}')
+    print(f'++++++in get target parth {filename}')
     if directory in imgseq_directories:
         #already got that folder
         print(f'imseq_targetpathes  at {filename} are {imgseqfolder}')
@@ -280,9 +270,10 @@ def split_filepath(filepath):
 
 
 def sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories): 
-    type = get_sequence_type(context, seq)
+    type = get_sequence_type(seq)
+    print(f'in sequence to copy seq {seq.name} type {type}')
     if type == 'MOVIE': #hasattr(seq, "filepath"): #videosequence
-        #print(f'this has filepath: {seq.name}')
+        
         
         ####from different directories 
         directory, basename = os.path.split(seq.filepath)
@@ -310,6 +301,7 @@ def sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directori
     elif type == 'IMGSEQ' or type == 'IMAGE': #  hasattr(seq, "directory"):#image sequence
         directory = seq.directory
         directory = equalize_directory(directory)
+        print(f'########equalized {directory}')
         #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
         targetpath, imgseq_directories = get_imgseq_target_path(context, seq.elements[0].filename, directory, imgseq_directories)
         #imgseq_directories[directory] = targetpath
@@ -508,12 +500,12 @@ def build_blend_from_original(context, filepathes, imgseq_directories, vid_direc
         
         for seq in sequences: 
             #print(seq.name)
-            type = get_sequence_type(context, seq)
+            type = get_sequence_type(seq)
             if type == 'MOVIE': #hasattr(seq, "filepath"):
                 seq.filepath = get_rebuildPath_from_filepathes(context, seq.filepath, filepathes)
             elif type == 'SOUND':# hasattr(seq, "sound"):
                 seq.sound.filepath = get_rebuildPath_from_filepathes(context, seq.sound.filepath, filepathes)   
-            elif hasattr(seq, "directory"):####is image, not nice
+            elif type == 'IMGSEQ' or type == 'IMAGE':####is image, not nice
                 directory = seq.directory
                 directory = equalize_directory(directory)
                 print(f'image sequence directories are {imgseq_directories}')
@@ -555,14 +547,18 @@ def collect_snippets(context):
         if hasattr(scene, 'vse_archiver'):
             #set scene active 
             context.window.scene = scene
-            
-            
-            
-            sequences = get_visible_sequences(scene)#  scene.sequence_editor.sequences_all)
-            
+
             #in cases user is in metastrip
             find_toplevel(context, scene, context.sequences)
+            sequences = get_sequences_4process(context, scene) #scene.sequence_editor.sequences[:] #get_visible_sequences(scene)#
             #print(bb)
+            if arch_props.remove_fade:
+                #remove memory of old keyframes
+                scene.vse_archiver.keys.clear()
+                keylist = get_fades(scene, sequences) #all_vis
+                remove_fades(scene, sequences)
+                #print(bb)
+            
             all_vis_seqs = get_all_visible_sequences(scene)
             #print(f'scene {scene.name} sequences found {sequences}')
             
@@ -587,7 +583,19 @@ def collect_snippets(context):
     if context.scene.vse_archiver.rebuild:
         build_blend_from_original(context, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
         #save_blend_file(context)
-            
+
+def get_sequences_4process(context, scene):
+    seqs = []
+    sequences = scene.sequence_editor.sequences 
+    for seq in sequences:
+        answer = copy_or_render(context, scene, seq)
+        if answer == 'META' or answer == 'RENDER' or answer == 'COPY':
+            seqs.append(seq)
+    print(f'seqs 4 processing {seqs}')
+    return seqs
+
+
+
 def homogenous_addon_settings_over_scene(context):
     
     
@@ -613,22 +621,20 @@ def homogenous_addon_settings_over_scene(context):
         va.use_blend_data = context.scene.vse_archiver.use_blend_data
                 
 def copy_render_decider(context, scene, filepathes, imgseq_directories, sequences, vid_directories, audio_directories, font_directories):
-    percent = 100/len(sequences)
-    context.window_manager.progress_begin(0,100)
+    #percent = len(sequences+1)/10
+    #context.window_manager.progress_begin(0,len(sequences)+1)
     new_seqs=[]
-    for n,seq in enumerate(sequences[:]):
-        context.window_manager.progress_update(n*percent)
+    for seq in sequences[:]:
+        print(f'START PROCESSING SEQuence {seq.name}------------------------------------------------')
+        #context.window_manager.progress_update(n)
         answer = copy_or_render(context, scene, seq)
         print(f'for seq {seq.name} got answer {answer}')
+        
         if answer == 'COPY':
             filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
         elif answer == 'RENDER':
             filepathes, vid_directories, new_seqes = render_sequence(context, seq, scene, False, filepathes, vid_directories)
             new_seqs.extend(new_seqes)
-            '''if newmovie != None:
-                new_seqs.append(newmovie)
-            if newsound != None:
-                new_seqs.append(newsound)'''
         elif answer == 'META':
             filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqes = render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
             new_seqs.extend(new_seqes)
@@ -675,7 +681,7 @@ def get_all_visible_sequences(scene):
 
 def set_sequences_visibility(vis_seqs, scene):
     for seqvis in vis_seqs:
-        print(f'visible sequences after render are {vis_seqs}')
+        #print(f'visible sequences after render are {vis_seqs}')
         for seq in scene.sequence_editor.sequences_all:
             if seq == seqvis:
                 seq.mute = False
@@ -700,17 +706,23 @@ def get_effectstrip_cascade(seq, seqs):
     return seqs
 
 def set_vis_for_render(seqs, scene):
+    
     #adjust for metastrip
     print(f'seqs before everything {seqs}')
     for m_seq in seqs:
-        #print(f'mseqs type {m_seq.type}')
-        if m_seq.type == 'META':
+        type = get_sequence_type(m_seq)
+        
+        if type == 'META':
+            print(f'mseqs type {type}')
             for se in m_seq.sequences:
+                print(f'se {se.name}')
                 if se.mute == False:
-                    print(se.name)
-                    seqs.append(se)
+                    print(f'is false {se.name}')
+                    if se not in seqs:
+                        seqs.append(se)
+                    #print(bb)
             
-    
+    print(f'seqs plus meta {seqs}')
     
     #find effect strips 
     for a_seq in scene.sequence_editor.sequences_all:
@@ -722,7 +734,8 @@ def set_vis_for_render(seqs, scene):
         parent = p_seq.parent_meta()
         if parent != None: 
             if parent.mute == False:###richtig???
-                seqs.append(parent)
+                if parent not in seqs:
+                    seqs.append(parent)
     print(f'seqs after effectstrip cascade {seqs}')
             
     #####don't set vis false when its a speed track or other effect strip 
@@ -731,7 +744,7 @@ def set_vis_for_render(seqs, scene):
     for seq in seqs:    
         seq.mute = False
     #print('necessary seq muted')
-    print(brak)
+    #print(brak)
     
 def set_rendersettings(context):
     for sc in bpy.data.scenes:
@@ -779,33 +792,22 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     scene.frame_start = render_start
     scene.frame_end = render_end
     # copy list of visible sequences 
-    ori_vis_seqs = get_visible_sequences(scene)
+    ori_vis_seqs = get_all_visible_sequences(scene) #get_visible_sequences(scene)
     
     
     #hide_all sequences but the active and effect
-    #if not is_meta:
-    set_vis_for_render([seq], scene)
+    if not is_meta:
+        set_vis_for_render([seq], scene)
     
     ###handle fade
     
-    scene.vse_archiver.keys.clear()
+    
     #generate a fade keyframes from the visible sequences
     all_vis = get_all_visible_sequences(scene)
-    if arch_props.remove_fade:
-        keylist = get_fades(scene, all_vis)
-        remove_fades(scene, all_vis)
+    
     oldname=copy.copy(seq.name)
-    
+    print(f' oldname {oldname} seq {seq.name}')
     #print(bb)
-    
-    '''#set video render (seems to need the setting in the active scene and not the processed scene)
-    scene.render.image_settings.file_format = 'FFMPEG'
-    #context.scene.render.image_settings.file_format = 'FFMPEG'
-    scene.render.ffmpeg.format = 'MPEG4'
-    #context.scene.render.ffmpeg.format = 'MPEG4'
-    scene.render.ffmpeg.audio_codec = 'AAC'
-    #context.scene.render.ffmpeg.audio_codec = 'AAC'
-    '''
     
     # set new name and folder rendering
     filepath = os.path.join(arch_props.target_folder, context.scene.name)
@@ -820,7 +822,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     context.scene.render.filepath = renderpath
     
     #if seq.type == "META":
-    print(bb)
+    #    print(bb)
     # render sequence 
     bpy.ops.render.render(animation=True)
 
@@ -829,16 +831,16 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     scene.frame_start = init_start
     scene.frame_end = init_end
     
-    #if not is_meta:
-    set_sequences_visibility(ori_vis_seqs, scene)
+    if not is_meta:
+        set_sequences_visibility(ori_vis_seqs, scene)
     
     if arch_props.rebuild:
         new_seqes = replace_sequence_w_rendered(context, scene, seq, renderpath)
     
     
     
-    if arch_props.remove_fade:
-        reset_fade_keyframes(scene, oldname, new_seqes[0], keylist)
+    
+    
     
     ##filepathes only meant for copying original files
     target_directory, basename = os.path.split(renderpath)
@@ -850,33 +852,46 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
 def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     parent = seq.parent_meta()
     newseqes = []
+    
+    #####warum gehts in parent? 
     if parent == None: 
         sequences = scene.sequence_editor.sequences    
     else: 
         sequences = parent.sequences
+    
     ##new sequence 
-    type = get_sequence_type(context, seq)
-    if type == 'META' or  type == 'SCENE':
+    type = get_sequence_type(seq)
+    if type == 'META':# or  type == 'SCENE':
         #make meta
         newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
         newseq.frame_final_end = seq.frame_final_end
+        
         #
-        newmovie = newseq.sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
-        newsound = newseq.sequences.new_sound(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
-        newseqes = [newseq, newmovie, newsound]
+        newmovie = newseq.sequences.new_movie(seq.name+'movreplaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
+        newsound = newseq.sequences.new_sound(seq.name+'audreplaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+        newseqes = [newseq, newmovie, newsound] ### fade take the first of this list
     elif type == 'SOUND':
         newseq = sequences.new_sound(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
         newseqes = [newseq]
+    elif  type == 'SCENE':
+        newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
+        newseq.frame_final_end = seq.frame_final_end
+        newmovie = newseq.sequences.new_movie(seq.name+'movreplaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
+        newsound = newseq.sequences.new_sound(seq.name+'audreplaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
     else:
         newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
         newseqes = [newseq]
+        
+    if scene.vse_archiver.remove_fade:
+        reset_fade_keyframes(scene, seq.name, newseq)
     
-    
+    channel = copy.copy(seq.channel)
+    #if not type == 'META':
     for seq_cont in sequences:
         if seq == seq_cont:
             sequences.remove(seq)
 
-    
+    newseq.channel = channel
         
     return newseqes
 
@@ -957,7 +972,7 @@ def get_metadata_from_seq(context, seq):
 def copy_or_render(context, scene, seq):
     arch_props = scene.vse_archiver 
 
-    type = get_sequence_type(context, seq)
+    type = get_sequence_type(seq)
     if type == 'IGNORE':
         #print(f'Ignored Sequence {seq.name} type {seq.type}')
         return 'IGNORE'
@@ -1008,10 +1023,11 @@ def get_seq_render_tag(scene, seq):
         if s.name == seq.name:
             return s.render_inside
     
-    
+    print('!!!!!!!!!!!!!!!!!! No RENDER TAG FOUND!!!!!!!!!!!') 
 
 
-def get_sequence_type(context, seq): 
+def get_sequence_type(seq): 
+    #print(f'get sequence bug seq.name {seq.name}')
     
     if seq.type == 'MOVIE': #hasattr(seq, "filepath"): #videosequence
        return 'MOVIE'  
@@ -1041,24 +1057,27 @@ def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid
     # should the elements be rendered individually? 
     if is_render_elements(context, scene, seq):
         filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqs = copy_render_decider(context, scene, filepathes, imgseq_directories, seq.sequences, vid_directories, audio_directories, font_directories) 
-        set_sequences_visibility(vis_seqs,scene)
         vis_seqs.extend(new_seqs)
+        set_sequences_visibility(vis_seqs,scene)
     #   yes: send individual elements to be rendered render_sequence(context, seq, scene, is_meta) 
     #   NO: send this meta strip to render_sequence(context, seq, scene, is_meta)
     else: 
         #get metastrip elements 
+        print(f'-------------------------- who is the transform guide {seq}')
         elements =[seq]
         for subseq in seq.sequences:
             if subseq not in elements:
                 if subseq.mute == False:
                     elements.append(subseq)
-        #elements.append(seq)
         
-        #vis_seqs = get_visible_sequences(scene)
+        ##find effekt strips
+        
+        
         #set visibility for elements (careful will be set in render_sequences again)
-        set_vis_for_render (elements, scene)
-        
+        set_vis_for_render(elements, scene)
+        #print(bb)
         filepathes, vid_directories, new_seqes = render_sequence(context, seq, scene, True, filepathes, vid_directories)
+        
         vis_seqs.extend(new_seqes)
         new_seqs.extend(new_seqes)
         
@@ -1161,7 +1180,7 @@ def update_sequences_data(context):
             #print(f'seq {seq.name} ')
             
             if seq.name not in arch_sequences:
-                type = get_sequence_type(context, seq)
+                type = get_sequence_type(seq)
                 if type in ['MOVIE', 'SOUND', 'IMAGE', 'IMGSEQ', 'SCENE']:
                     print(f'ele {seq.name} ')
                     ele = arch_sequences.add()
@@ -1260,9 +1279,12 @@ def fade_fcs(scene, seq):
                 print(f'fc data path {fc.data_path}')
                 if fadetypes_in_datapath(fc.data_path):
                     print(f'check1 seq name {seq.name}')
-                    if seq.name in fc.data_path:
+                    l = fc.data_path.split('"')
+                    namefromDatapath = l[-2]
+                    if seq.name == namefromDatapath:
                         print('check2')
-                        print(f'found fcurve of seq {seq.name}')
+                        print(f'found fcurve of seq {seq.name} with data path {fc.data_path} check {namefromDatapath}')
+                        
                         fcs.append(fc)            
     return fcs
     #return None
@@ -1296,17 +1318,25 @@ def get_fade_keydatalist(scene, seq, fc):
 
 
 
-def reset_fade_keyframes(scene, oldname, newseq, keys):
+def reset_fade_keyframes(scene, oldname, newseq):
     print('in reset fade')
+    #keys = scene.vse_archiver.keys
+    #print_list(keys)
+    print(f'{newseq.name} fade stuff')
     keys = scene.vse_archiver.keys
-    print_list(keys)
-    print(f'')
+    
     for key in keys:
         if key.seq_name == oldname:
+            print(f'data path {key.data_path}')
+            print(f'old name {oldname}')
             data_path = key.data_path.replace(oldname, newseq.name)
             newkey = scene.keyframe_insert(data_path)
+            print(f'odl name {oldname} data path {data_path}') 
             set_keyframes(scene, newseq, key.attr,  key.value, key.frame)
             #newkey.co = (key.frame, key.value)
+            
+    
+    
     
     '''context.scene.frame_current = start[0]
     mod.time = start[1]
