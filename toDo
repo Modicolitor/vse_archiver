@@ -38,17 +38,8 @@ Copy original:
 
 Todo
     
-    [+] check copy_or_render( for order individual before type settings) 
-    [+] output back to beginning --> [+] test
-    [+] settings by type not shared over scenes 
-    
-    
-    [Problem?] doesn't report error for missing files inside of metafiles
-    
-    [] test visibility/mute of effekt strips
+   [] Collect snippets: Replaced Video and img sequences (not scene or meta) strips get an +1 Frame to their end 
 
-    [+] channel einfügen ist +1 bei replace
-    [] 
 
 
 

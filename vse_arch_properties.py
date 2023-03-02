@@ -77,7 +77,7 @@ class VSE_Archiver_PropGroup(bpy.types.PropertyGroup):
     mode: bpy.props.EnumProperty(
         name='',  
         description='List of forms avaiable in single connector mode',
-        default='2',
+        default='1',
         items=[('1', 'Collect Originals', ''),
                ('2', 'Collect Snippets', ''),
                #('3', 'Collect Blend Elements', ''),

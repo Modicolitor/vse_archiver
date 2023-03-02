@@ -873,6 +873,7 @@ def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     elif type == 'SOUND':
         newseq = sequences.new_sound(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
         newseqes = [newseq]
+        newseq.frame_final_end = newseq.frame_final_end - 1
     elif  type == 'SCENE':
         newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
         newseq.frame_final_end = seq.frame_final_end
@@ -881,6 +882,7 @@ def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     else:
         newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
         newseqes = [newseq]
+        newseq.frame_final_end = newseq.frame_final_end - 1
         
     if scene.vse_archiver.remove_fade:
         reset_fade_keyframes(scene, seq.name, newseq)
@@ -1063,7 +1065,7 @@ def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid
     #   NO: send this meta strip to render_sequence(context, seq, scene, is_meta)
     else: 
         #get metastrip elements 
-        print(f'-------------------------- who is the transform guide {seq}')
+        #print(f'-------------------------- who is the transform guide {seq}')
         elements =[seq]
         for subseq in seq.sequences:
             if subseq not in elements:
