@@ -508,7 +508,7 @@ def build_blend_from_original(context, filepathes, imgseq_directories, vid_direc
             elif type == 'IMGSEQ' or type == 'IMAGE':####is image, not nice
                 directory = seq.directory
                 directory = equalize_directory(directory)
-                print(f'image sequence directories are {imgseq_directories}')
+                #print(f'image sequence directories are {imgseq_directories}')
                 #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
                 seq.directory = imgseq_directories[directory] 
 
@@ -633,7 +633,7 @@ def copy_render_decider(context, scene, filepathes, imgseq_directories, sequence
         if answer == 'COPY':
             filepathes, imgseq_directories, vid_directories, audio_directories, font_directories = sequence_to_copy(context, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
         elif answer == 'RENDER':
-            filepathes, vid_directories, new_seqes = render_sequence(context, seq, scene, False, filepathes, vid_directories)
+            filepathes, vid_directories, new_seqes, imgseq_directories = render_sequence(context, seq, scene, False, filepathes, vid_directories, imgseq_directories)
             new_seqs.extend(new_seqes)
         elif answer == 'META':
             filepathes, imgseq_directories, vid_directories, audio_directories, font_directories, new_seqes = render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid_directories, audio_directories, font_directories)
@@ -777,7 +777,7 @@ def set_rendersettings(context):
         sc.render.image_settings.tiff_codec = context.scene.render.image_settings.tiff_codec
         
         
-def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
+def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories, imgseq_directories):
     arch_props = scene.vse_archiver
     #remember fade 
     #remember frame range 
@@ -816,13 +816,25 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     #actually filepath, try how split reachts to a simple name
     renderpath, vid_directories = get_video_target_path(context, FakeOrifilepath, vid_directories) 
     
-    renderpath = renderpath + get_extension(context)
-    #print(renderpath)
+    
+    ###render to image case 
+    is_image, not_ffmpeg, no_audio, no_videocodec = check_rendersettings(context)
+    
+    if not is_image:    
+        renderpath = renderpath + get_extension(context)
+    else:
+        dirpath, basename = os.path.split(renderpath)
+        if dirpath not in imgseq_directories:
+            imgseq_directories[dirpath] = dirpath
+            #basename += str(render_start)
+
     scene.render.filepath = renderpath
     context.scene.render.filepath = renderpath
     
-    #if seq.type == "META":
-    #    print(bb)
+    
+    
+    
+    
     # render sequence 
     bpy.ops.render.render(animation=True)
 
@@ -847,7 +859,7 @@ def render_sequence(context, seq, scene, is_meta, filepathes, vid_directories):
     filepathes[os.path.join(target_directory, basename)] = os.path.join(target_directory, basename)
     #print(f'rendered {new_seq.name} and saved oripath {FakeOrifilepath}  render path {renderpath}')
     
-    return filepathes, vid_directories, new_seqes
+    return filepathes, vid_directories, new_seqes, imgseq_directories
         
 def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     parent = seq.parent_meta()
@@ -861,28 +873,58 @@ def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     
     ##new sequence 
     type = get_sequence_type(seq)
-    if type == 'META':# or  type == 'SCENE':
-        #make meta
-        newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
-        newseq.frame_final_end = seq.frame_final_end
+    is_image, not_ffmpeg, no_audio, no_videocodec = check_rendersettings(context)
+    if not is_image:
+        if type == 'META':# or  type == 'SCENE':
+            #make meta
+            newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
+            newseq.frame_final_end = seq.frame_final_end
+            
+            #
+            newmovie = newseq.sequences.new_movie(seq.name+'movreplaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
+            newsound = newseq.sequences.new_sound(seq.name+'audreplaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+            newseqes = [newseq, newmovie, newsound] ### fade take the first of this list
+        elif type == 'SOUND':
+            newseq = sequences.new_sound(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+            newseqes = [newseq]
+            newseq.frame_final_end = newseq.frame_final_end - 1
+        elif  type == 'SCENE':
+            newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
+            newseq.frame_final_end = seq.frame_final_end
+            newmovie = newseq.sequences.new_movie(seq.name+'movreplaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
+            newsound = newseq.sequences.new_sound(seq.name+'audreplaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+        else:
+            newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
+            newseqes = [newseq]
+            newseq.frame_final_end = newseq.frame_final_end - 1
+    else: 
         
-        #
-        newmovie = newseq.sequences.new_movie(seq.name+'movreplaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
-        newsound = newseq.sequences.new_sound(seq.name+'audreplaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
-        newseqes = [newseq, newmovie, newsound] ### fade take the first of this list
-    elif type == 'SOUND':
-        newseq = sequences.new_sound(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
-        newseqes = [newseq]
-        newseq.frame_final_end = newseq.frame_final_end - 1
-    elif  type == 'SCENE':
-        newseq = sequences.new_meta(seq.name+'replaced', channel = seq.channel, frame_start = seq.frame_final_start)
-        newseq.frame_final_end = seq.frame_final_end
-        newmovie = newseq.sequences.new_movie(seq.name+'movreplaced', newfilepath, channel = seq.channel+1, frame_start = seq.frame_final_start)
-        newsound = newseq.sequences.new_sound(seq.name+'audreplaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
-    else:
-        newseq = sequences.new_movie(seq.name+'replaced', newfilepath, channel = seq.channel, frame_start = seq.frame_final_start)
-        newseqes = [newseq]
-        newseq.frame_final_end = newseq.frame_final_end - 1
+        ######needs a zero when smaller 1000
+        #print(len(str(seq.frame_final_start)))
+        #zero = str(seq.frame_final_start).zfill(4) ###could be blenders internal number for this thing
+        #newfilepath += zero + str(seq.frame_final_start) + get_extension(context)
+        path, basename = os.path.split(newfilepath)
+        
+        
+        # rendering image sequences 
+        newseq = sequences.new_image(seq.name+'replaced', newfilepath+ str(seq.frame_final_start).zfill(4)+get_extension(context), channel = seq.channel, frame_start = seq.frame_final_start)
+        
+            
+        append_img_elements(context, newseq, basename, seq.frame_final_start+1, seq.frame_final_end) 
+        #newseq.elements.pop(0) 
+        
+        if type == 'META':
+            newseq.frame_final_end -= 1 
+        elif  type == 'SCENE':
+            newseq.frame_final_end -= 1 
+        elif type == 'IMAGE':
+            newseq.frame_final_end -= 1 
+        elif type == 'IMGSEQ':
+            newseq.frame_final_end -= 1 
+        elif type == 'Movie':
+            newseq.frame_final_end -= 1 
+        else:
+            newseq.frame_final_end -= 1 
         
     if scene.vse_archiver.remove_fade:
         reset_fade_keyframes(scene, seq.name, newseq)
@@ -896,6 +938,18 @@ def replace_sequence_w_rendered(context, scene, seq, newfilepath):
     newseq.channel = channel
         
     return newseqes
+
+def append_img_elements(context, newseq, basename, start, end):
+    ext = get_extension(context)
+    
+    i = start
+    while i <= end:
+        name = basename + str(i).zfill(4)
+        name += ext
+        newseq.elements.append(name)
+        i += 1
+    #dsf     
+        
 
 def get_extension(context):
     format = context.scene.render.image_settings.file_format # 'FFMPEG', 'AVI_RAW', 'AVI_JPEG', 'WEBP', 'TIFF', 'HDR', 'OPEN_EXR', 'OPEN_EXR_MULTILAYER', 'DPX', 'CINEON', 'TARGA_RAW', 'TARGA', 'JPEG2000', 'JPEG2000', 'PNG', 'IRIS', 'BMP'
@@ -1003,7 +1057,12 @@ def copy_or_render(context, scene, seq):
         
     if type =='SOUND':
         if get_seq_render_tag(scene, seq): #arch_props.render_sound and 
-            return 'RENDER'
+            #dont render audio
+            is_image, not_ffmpeg, no_audio, no_videocodec = check_rendersettings(context)
+            if not  is_image:
+                return 'RENDER'
+            else:
+                return 'COPY'
         else:
             return 'COPY'
     if type == 'META':
@@ -1078,7 +1137,7 @@ def render_meta_snipets(context, scene, seq, filepathes, imgseq_directories, vid
         #set visibility for elements (careful will be set in render_sequences again)
         set_vis_for_render(elements, scene)
         #print(bb)
-        filepathes, vid_directories, new_seqes = render_sequence(context, seq, scene, True, filepathes, vid_directories)
+        filepathes, vid_directories, new_seqes, imgseq_directories = render_sequence(context, seq, scene, True, filepathes, vid_directories, imgseq_directories)
         
         vis_seqs.extend(new_seqes)
         new_seqs.extend(new_seqes)

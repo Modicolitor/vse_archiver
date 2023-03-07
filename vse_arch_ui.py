@@ -44,7 +44,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 if arch_props.mode == '1':
                     #####collect originals
                     
-                    subcol.operator("varch.coloriginal", text="Archiv Originals",
+                    subcol.operator("varch.coloriginal", text="Archive Sources",
                                     icon="COPYDOWN")
                     
                     #####WARNING####
@@ -69,7 +69,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                 
                 if arch_props.mode == '2':
                     subcol.prop(arch_props, "remove_fade", text = 'Full opacity during render')
-                    subcol.operator("varch.colsnippets", text="Archiv Snippets",
+                    subcol.operator("varch.colsnippets", text="Archive Snippets",
                                     icon="RESTRICT_RENDER_OFF")
                     
                     
@@ -259,7 +259,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                         
                         
                     if is_image:
-                        subcol =  col.box()
+                        #subcol =  col.box()
                         subcol.prop(arch_props, 'render_imag_output')
                     #subcol.operator('varch.tester')
 

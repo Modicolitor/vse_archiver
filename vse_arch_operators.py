@@ -33,7 +33,7 @@ def is_everythingpoll(context):
 class PP_OT_Initialize_Archiver(bpy.types.Operator):
     '''Initialize VSE Archiver Addon'''
 
-    bl_label = "Add Single Couplings"
+    bl_label = "Initialize Archiver"
     bl_idname = "varch.init"
     bl_options = {'REGISTER', "UNDO"}
 

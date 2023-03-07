@@ -34,15 +34,14 @@ Copy original:
 
     
 
-    [] test scene render stuff
+    
 
 Todo
     
-   [] Collect snippets: Replaced Video and img sequences (not scene or meta) strips get an +1 Frame to their end 
+    [] audio needs to be excluded when rendering snippets to images
 
 
-
-
+    [+] Collect snippets: Replaced Video and img sequences (not scene or meta) strips get an +1 Frame to their end 
     [+] render.image_settings.color_depthand more
     [?????seems to work] fade on metastrips lost when render inside 
     
