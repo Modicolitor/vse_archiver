@@ -189,6 +189,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     #box = col.box() 
                     active = context.active_sequence_strip
                     if active != None:
+                        type = get_sequence_type(active)
                         if active.name in arch_props.metastrips:
                             #subcol.prop(arch_props.metastrips[active.name], "render_inside")
                             if get_seq_render_tag(context.scene, active):
@@ -207,18 +208,31 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                             #if active.name not in arch_props.metastrips:
                                 
                             #subcol.prop(arch_props.sequences[active.name], "pls_render", text='Render Sequence')
-                            
-                            if get_seq_render_tag(context.scene, active):
-                                
-                                row.operator("varch.seqoff",
-                                            icon="UNPINNED", text="Copy", depress=False)
-                                row.operator("varch.seqon",
-                                            icon="PINNED", text="Render", depress=True)
+                            if type != 'SCENE':
+                                if get_seq_render_tag(context.scene, active):
+                                    
+                                    row.operator("varch.seqoff",
+                                                icon="UNPINNED", text="Copy", depress=False)
+                                    row.operator("varch.seqon",
+                                                icon="PINNED", text="Render", depress=True)
+                                else:
+                                    row.operator("varch.seqoff",
+                                                icon="UNPINNED", text="Copy", depress=True)
+                                    row.operator("varch.seqon",
+                                                icon="PINNED", text="Render", depress=False)
                             else:
-                                row.operator("varch.seqoff",
-                                            icon="UNPINNED", text="Copy", depress=True)
-                                row.operator("varch.seqon",
-                                            icon="PINNED", text="Render", depress=False)
+                                #if scene
+                                if get_seq_render_tag(context.scene, active):
+                                    
+                                    row.operator("varch.seqoff",
+                                                icon="UNPINNED", text="Ignore", depress=False)
+                                    row.operator("varch.seqon",
+                                                icon="PINNED", text="Render", depress=True)
+                                else:
+                                    row.operator("varch.seqoff",
+                                                icon="UNPINNED", text="Ignore", depress=True)
+                                    row.operator("varch.seqon",
+                                                icon="PINNED", text="Render", depress=False)
                                 
                     subcol =  box.column()
                     ###active data set
