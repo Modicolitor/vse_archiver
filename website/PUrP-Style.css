@@ -1,0 +1,95 @@
+h5 {
+			font-style: italic;
+			color: #1d1d1d;
+			text-align: center;
+}
+
+h4	{
+	font: bold;
+	font-style: italic;
+	color: #1d1d1d;
+	text-align: center;
+}
+
+h2 {
+	color: #1d1d1d;
+	text-align: center;
+}
+
+h3 {
+	color: #1d1d1d;
+	text-align: center;
+}
+
+h1 {
+	size:  120em;
+	text-align: center;	
+	padding-top: 0%;
+	text-shadow: 	0px 2px rgba(0,0,0,0.4),
+				0px 8px 13px rgba(0,0,0,0.1),
+				0px 18px 23px rgba(0,0,0,0.4)	
+}
+
+ul, ol {
+
+	color: #1d1d1d;
+	
+	
+
+}
+
+.btn {	
+	color: #dfa100;
+	background: #FFfFFf;
+	margin: 0.5em;
+	font-weight: bold;
+	padding-bottom: 1.2em;
+	padding-top: 1.2em;
+
+}
+
+.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default {
+    color: #dfa100;
+    background-color: #fff;
+    
+}
+
+.jumbotron .h1, .jumbotron h1 {
+	font-size: 8em;
+}
+
+.navbar {
+	background-color: #1d1d1d;
+	color: #fafaff;
+
+}
+
+.icon-bar {
+  color: #fafaff;
+  border-color: #fafaff;
+  background-color: #fafaff;
+}
+
+a {
+	color: #fafaff;
+}
+
+.jumbotron {
+	
+	background-position: center;
+	background-size: cover;
+	color: #fafaff;
+}
+
+.nav > li > a:focus, 
+.nav > li > a:hover 
+{
+    
+    background-color: #dfa100;
+    color: #fafaff;
+}
+
+a:focus, a:hover {
+    color: #fafaff !important;
+}
+

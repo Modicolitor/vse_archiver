@@ -249,7 +249,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                     has_equal_met = has_equal_metas(context)
                     same_dir = is_target_equ_source(context)
                     
-                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met or same_dir or no_videocodec:
+                    if is_image or not_ffmpeg or no_audio or not has_equal_seq or not has_equal_met or same_dir or no_videocodec or context.scene.vse_archiver.target_folder == '':
                         subcol =  col.box() 
                         #subcol.alignment = 'CENTER'
                         subcol.label(text="Warning!!")
