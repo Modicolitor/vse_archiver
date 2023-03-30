@@ -16,11 +16,11 @@ import bpy
 bl_info = {  # für export als addon
     "name": "VSE Archiver",
     "author": "Modicolitor",
-    "version": (3, 2),
-    "blender": (3, 2, 0),
+    "version": (3, 50),
+    "blender": (3, 5, 0),
     "location": "Sequence Editor > Tools",
-    "description": "Save used Footage of a VSE Video project",
-    "doc_url": "", ####################
+    "description": "Collects all Footage used in a VSE Video project to a Folder.",
+    "doc_url": "http://vse-archiver.modicolitor.com/Dokumentation.html", ####################
     "category": "Tool"}
 
 # modules = addon_auto_imports.setup_addon_modules(

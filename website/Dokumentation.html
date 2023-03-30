@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>PuzzleUrPrint - Dokumentation</title>
+	<title>VSE Archiver - Dokumentation</title>
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="PUrP-Style.css">
+	<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 	
 
 	<script
@@ -50,18 +51,19 @@
 <h3 style="text-align: left;">What is VSE-Archiver?</h3>
 
 <div class="row">
-	<div class="col-lg-3 col-sm-12">
-		<img src="Dokumentation_Pics/coupexamples1.jpg" class="img-thumbnail rounded mx-auto d-block">
+	<div class="col-lg-5 col-sm-12">
+		<img src="Dokumentation_Pics/subtitles.jpg" class="img-thumbnail rounded mx-auto d-block">
 	</div>
  
 
- 	<div class="col-lg-9 col-sm-12 nextTo">
+ 	<div class="col-lg-7 col-sm-12 nextTo">
 		 <div>	
-			The VSE Archiver is a Blender addon supposed to produce a back-up of your video project. It will create an Archive Folder you specify, collects all the footage used into a destinct folder structure and relinks all media in the new blend file created in the folder. This results in a handy BackUp Folder which includes only the media used consolidated into an ordered folder structure ready to be archived or send to a customer demanding the project files. 
+			The VSE Archiver is a Blender addon that produces a back-up of your video project. It will collect all the footage used in your videoproject into a distinct folder structure and relinks all sequence strips in the now  archived blend file to the archive folder. 
+			This results in a handy back-up folder which includes only the media used consolidated into an ordered folder structure ready to be archived or send to a customer demanding the project files. 
 			<ul> 
 				<li>Footage distributed over your system will end up in a clean folder structure.</li>
 				<li>Project size will be decreased because only the used footage will be collected</li>
-				<li>Decide whether you want to copy the original footage or render the indiviudal strips</li>
+				<li>Decide whether you want to copy the source footage or render the indiviudal strips</li>
 				<li>Footage includes Images, Imagesequences, Video, Audio and Fonts which will be found either used in vse strips or mentioned in the blend data </li>
 			</ul> 
 		</div>		
@@ -72,44 +74,51 @@
 
 
 
-		<ul> 
-			<li>install by File/User Preferences.../Addons/Install from File/</li>
-		</ul>
+		
 	<div class="row">
-		<div class="col-lg-3 col-sm-12"></div>
-		<div class="col-lg-6 col-sm-12">
-			<img src="Dokumentation_Pics/install.jpg" class="img-thumbnail rounded mx-auto d-block">
-		<h5>Install Add-on from the zip-File and check the checkbox.</h5>
+		<div class="col-lg-5 col-sm-12"><img src="Dokumentation_Pics/install.jpg" class="img-thumbnail rounded mx-auto d-block"></div>
+		<div class="col-lg-7 col-sm-12">
+			
+			
+		In Blender open the "Edit"-dropdown menu. Choose "Preferences...". In the side bar click on Add-ons. Click on "Install..." at the top of the window. 
+		Locate the "vse-archiver_3-4_V0.zip" on your computer and double click or click "Install Addon" in the bottom of the window. Check the check box next to "VSE Archiver". 
+		In order to have the "VSE Archiver" loaded on default with Blender click "Save User Settings" under the hamburger menu in the left bottom corner and exit User Preferences. 
+		
 	</div>
 	<div class="col-lg-3 col-sm-12"></div>
 </div>	
-
-	<div>	
-	In Blender open the "Edit"-dropdown menu. Choose "Preferences...". In the side bar click on Add-ons. Click on "Install..." at the top of the window. Locate the "vse-archiver_3-4_V0.zip" on your computer and double click or click "Install Addon" in the bottom of the window. Check the check box next to "Puzzle Ur Print". In order to have the "Puzzle Ur Print" by loaded on default with Blender click "Save User Settings" under the Hamburgermenu in the left bottom corner and exit User Preferences. The "Puzzle Ur Print" Panel will now appear in the right side panel (n-panel) of the 3D-Viewport. 
-	</div> 
+<h3 style="text-align: left;">Where to find the addon controlls?</h3>
+<div class="row">
+	<div class="col-lg-5 col-sm-12"><img src="Dokumentation_Pics/AddonPosition.jpg" class="img-thumbnail rounded mx-auto d-block"></div>
+	<div class="col-lg-7 col-sm-12">
+		The "VSE Archiver" Panel will now appear in the right side panel (n-panel) of the <b>Sequence Editor</b>. 
+</div>
+</div>
+	
 
  <h3 style="text-align: left;">Typical Process</h3>
 
 <div class="row">
-	<div class="col-lg-3 col-sm-12">
-		<img src="Dokumentation_Pics/connector.jpg" class="img-thumbnail rounded mx-auto d-block">
+	<div class="col-lg-5 col-sm-12">
+		<img src="Dokumentation_Pics/modesoverview.jpg" class="img-thumbnail rounded mx-auto d-block">
 	</div>
  
 
- 	<div class="col-lg-9 col-sm-12 nextTo">
+ 	<div class="col-lg-7 col-sm-12 nextTo">
 		 <div>	
 			<ol>
 			<li>Find the Addon in the VSE toolbar (n-menu, to the right) </li>
 			<li>Initialize the addon by clicking the initialize Button </li>
-			<li>Specify a Target Folder where all the footage will be collected to. It must be an absolute path!! Uncheck the checkmark “relative path” in the right menu when choosing a folder</li>
-			<li>Choose If you either want to collect the original footage (simple copy of all source files to the new Archiv folder structure) or collect the snippets (renders the individual sequences into the new Archiv folder structure)</li>
+			<li>Specify a Target Folder where all the footage will be collected to. 
+			<li>Choose if you either want to collect the source files (simple copy of all source files to the new Archiv folder structure) or collect the snippets (renders the individual sequences into the new Archiv folder structure)</li>
 			<li>Adjust settings if you want something special</li>
-			<li>Click “Archiv Originals” or “Archiv Snippets”, respectively (May take a while)</li>
-			<li>The addon will now go through all scenes of the blend file and either copy all sourcefiles used in the VSE or render all sequence strips (“Collect Snippets” allows a mixed mode)</li>
+			<li>Click "Archiv Sources" or "Archiv Snippets", respectively</li>
+			<li>The addon will now go through all scenes of the blend file and either copy all sourcefiles used in the VSE or render all sequence strips ("Collect Snippets" allows a mixed mode)</li>
 			<li>Addon saves the blend file into the target folder </li>
 			<li>Relinks all the sequences and Blend data footage to the new location in the archive folder. </li>
-			<li>Makes the pathes relative</li>
-			<li>Blender awakes in the new Archiv file</li>
+			<li>Makes the paths relative</li>
+			<li>Blender awakes in the new Archive file</li>
+			<li>The project is ready to be archived or sent to the customer</li>
 		</ol>	
 		 </div>		
  	</div>
@@ -118,17 +127,17 @@
  <h3 style="text-align: left;">Main Modes</h3>
 
 <div class="row">
-	<div class="col-lg-3 col-sm-12">
+	<div class="col-lg-5 col-sm-12">
 		<img src="Dokumentation_Pics/modes.jpg" class="img-thumbnail rounded mx-auto d-block">
 	</div>
  
 
- 	<div class="col-lg-9 col-sm-12 nextTo">
+ 	<div class="col-lg-7 col-sm-12 nextTo">
 		 <div>	
 			The VSE Archiver offers two different approaches of archiving your footage: 
 		 	<ol> 
 				<li> Collect Sources: Copies the original source media </li>
-				<li> Collect Snippets: (primarily) Renders sequence strips and save them in the Archive Folder. However, copy or render can be decided either per media type or per strip</li>
+				<li> Collect Snippets: (primarily) Renders sequence strips and saves them in the Archive Folder. However, copy or render can be decided either per media type or per strip</li>
 			</ol>
 			Both Modes allow different functions to be adjusted to your liking and will be discussed in the following. 
 		 </div>		
@@ -139,15 +148,16 @@
 <h3 style="text-align: left;">Collect Sources</h3>
 
 <div class="row">
-	<div class="col-lg-4 col-sm-12">
+	<div class="col-lg-5 col-sm-12">
 		<img src="Dokumentation_Pics/CollectSources.jpg" class="img-thumbnail rounded mx-auto d-block">
 	</div>
  
 
- 	<div class="col-lg-8 col-sm-12 nextTo">
+ 	<div class="col-lg-7 col-sm-12 nextTo">
 		 <div>	
 
-			This mode is used to archive all original source files by copying them into the archive folder and relink them. Imagine the case where you filmed 10h hours, but only used 3 min of the material. There will be a lot unused material. Use this option to get an archive with only the used footage and get rid of the shaky shots you dared to delete, but eventually never used. 
+			This mode is used to archive all original source files by copying them into the archive folder and relinking them. Imagine a case where you filmed 10 hours, but only used 3 min of the material. 
+			There will be a lot of unused material. Use this option to get an archive with only the used footage and get rid of the shaky shots you didn't dare to delete, but eventually never used. 
 			
 		 </div>		
  	</div>
@@ -156,17 +166,17 @@
 <div class="row">
 	<div class="col-lg-6 col-sm-12">
 		<h4 style="text-align: left;">Pro</h4>
-			
-				<li>Is a source file used in several sequencer strips it is only copied once</li>
+			<ul>
+				<li>If a source file is used in several sequencer strips it is only copied once</li>
 				<li>No quality lost due to rendering </li>
 				<li>Effect strips stay untouched and adjustable</li>
-			
+			</ul>
 	</div>
 	<div class="col-lg-6 col-sm-12">
 			<h4 style="text-align: left;">Contra</h4>
-			
+			<ul>
 				<li>If only small portions of very long video files are used a lot more data than necessary is archived</li>
-			
+			</ul>
 		</div>
 
 </div>
@@ -177,17 +187,15 @@
  <h4 style="text-align: left;">Options</h4>
 
 <div class="row">
-	<div class="col-lg-4 col-sm-12">
-		<img src="Dokumentation_Pics/initialalize.jpg" class="img-thumbnail rounded mx-auto d-block">
-	</div>
- 
-
- 	<div class="col-lg-8 col-sm-12 nextTo">
+	
+  	<div class="col-lg-12 col-sm-12 nextTo">
 		 <div>	
-			
-				<li><b>Rebuild Blend File</b>: when this is checked the active blend file will be saved into the archive and all footage is relinked. When unchecked only the source material is copied into the archive. </li>
-				<li><b>Include Blend Data</b>: Blender sometimes saves links to video related media in the blend data of the file. When checked the addon will look for Images, Imagesequences, Video, Audio and Fonts and save them in the archive. Important for example when: 1 . you do compositor stuff (colorgrading, stabilizing footage, vfx) in another scene via the compositor and use a scene strip in the vse 2. You used another font then blender default 3. You use the scene strip of simple 3D scene with image textures… </li>
-				
+		<ul>
+				<li><b>Rebuild Blend File</b>: when this is checked the active blend file will be saved into the archive and all footage is relinked. When unchecked only the source material is copied into the archive without the blend file. </li>
+				<li><b>Include Blend Data</b>: Blender sometimes saves links related to media in the blend data of the blend file. When checked the addon will look for Images, Imagesequences, Video, Audio and Fonts and save them in the archive. 
+					Important for example when: 1 . you do compositor stuff (colorgrading, stabilizing footage, vfx) in another scene 2. You used another font than the blender default 
+					3. You use the scene strip of 3D scene with image textures...  </li>
+			</ul>
 			
 		 </div>		
  	</div>
@@ -200,28 +208,31 @@
 <div class="row">
 	<div class="col-md-4 col-sm-12" style="align-content: center;"><img src="Dokumentation_Pics/CollectSnippets.jpg" class="img-thumbnail rounded mx-auto d-block nextTo"></div>
 	<div class="col-md-8 col-sm-12">
-		The Collect Snippets mode is primarily designed to render individual strips into video files. However, you can decide per type or for the individual sequence whether you want it to be rendered or the source files copied. For example in most cases it doesnot make sense to render a video from a single image. The source should be copied instead. An image sequence might be more handy to be archived as video file. Individual setting overwrites the type setting. 
-		<h4 style="text-align: left;">Generalsettings</h4>
+		The Collect Snippets mode is primarily designed to render individual strips into video files. However, you can decide per type or for the individual sequence whether you want it to be rendered or the source files copied. 
+		For example in most cases it does not make sense to render a video from a single image. The source should be copied instead. An image sequence might be more handy to be archived as video file. Individual setting overwrites the type setting. 
+		<h4 style="text-align: left;">Options</h4>
 		<ul> 
 			
-			<li><b>Include Blend Data</b>:(same as above) when this is checked the active blend file will be saved into the archive and all footage is relinked. When unchecked only the source material is copied into the archive. </li>
-			<li><b>Rebuild Blendfile</b>:(same as above) Blender sometimes saves links to video related media in the blend data of the file. When checked the addon will look for Images, Imagesequences, Video, Audio and Fonts and save them in the archive. Important for example when: 1 . you do compositor stuff (colorgrading, stabilizing footage, vfx) in another scene via the compositor and use a scene strip in the vse 2. You used another font then blender default 3. You use the scene strip of simple 3D scene with image textures… </li></li>
-			<li><b>Full Opacity during Render</b>: When this checkbox is activated the addon will remove the alpha fade of the sequencer strips for rendering and add them back to the newly rendered and replaced strip.</li>
+			<li><b>Include Blend Data</b>:(see above) 
+			<li><b>Rebuild Blendfile</b>:(see above) 
+			<li><b>Full Opacity during Render</b>: When this checkbox is activated the addon will remove the alpha fade of the sequencer strips for rendering and add them back to the newly rendered and replaced strip. Generally, all alpha keyframes will be removed and applied back, not only fades.</li>
 		</ul>
 
-		<h4 style="text-align: left;">Settings by type</h4>
+		<h5 style="text-align: left;">Settings by Type</h5>
 		
+	<ul>
 			<li><b>Image, Imagesequence, Movie, Audio</b>: decide whether sequences of that type are rendered or the source files are copied.</li>
-			<li><b>Metastrips</b>: can be rendered as one strip or the inside is handled as individual strips</li>
+			<li><b>Metastrips</b>: can be rendered as one strip or the inside is processed as individual strips</li>
 			<li><b>Scene strips</b>: can be rendered or ignored</li>
-		
-		<h4 style="text-align: left;">Individual Settings</h4>
+		</ul>
+		<h5 style="text-align: left;">Individual Settings</h5>
 		<div>
-		When you select a sequence (active sequence) you can set copy or render (or for scene or meta strips as mentioned in settings by type) for this specific sequence. The individual setting will overwrite the settings set by type. 
-
-		<li><b>Update Sequence Data</b>: The addon collects information about the sequences when initialized. When you add or remove sequences, this data needs to be updated by clicking this button. An information text will appear, when this is necessary </li>
+		When you select a sequence (active sequence) you can set copy or render (or for scene or meta strips as mentioned in settings by type) for this specific sequence. When you change a type setting all sequences of that type will have their individual settings changed to the new setting. Previously set individual settings are getting lost for this type. BTW, in the end the individual settings for each strip decides how they are processed. 
+	<ul>
+		<li><b>Update Sequence Data</b>: The addon collects information about the sequences when initialized. When you add or remove sequences, this data needs to be updated by clicking this button. An information text will appear in the warning section, when this is necessary </li>
 		<li><b>Reset Sequence Data</b>: Resets all individual strip settings to the settings defined by type </li>
-		</div>
+	</ul>	
+	</div>
 		
 	</div>
 </div>
@@ -234,21 +245,16 @@
 <h3 style="text-align: left;">Warning panel</h3>
 
 <div class="row">
-	<div class="col-lg-3 col-sm-12">
+	<div class="col-lg-5 col-sm-12">
 		<img src="Dokumentation_Pics/warnings.jpg" class="img-thumbnail rounded mx-auto d-block">
 	</div>
  
 
- 	<div class="col-lg-9 col-sm-12 nextTo">
+ 	<div class="col-lg-7 col-sm-12 nextTo">
 		 <div>	
-		 	There are 4 types of connector modes. 
-		 	<ul>
-				<li>Stick</li>
-				<li>Male-Female (mf)</li>
-				<li>Flat</li>
-				<li>Planar</li>
-		 	</ul>
-		 	We saw a mf-connector in the first example. After applying, one of the resulting objects will be male and one will be female.%Stick mode will generate two female daughter objects and an additional 'Stick'-Object to connect both. Having the stick as an additional part can be beneficial. For example, you need to reprint less (only the stick), if your oversize value is off. We'll talk about oversize later. Flat is actually just a stupid plane. It cuts two things in half without any connector. Still can be useful if you want to glue stuff together anyway. Planar is a whole new world, compared to the other modes. Mathematically speaking (or was it topologically, geographically) the functionallity is here parallel to the maincut and not perpendicular like in the first two cases. Moreover, a planar can generate a large number of couplings with one object while the first two only produce one coupling. That's why I'll call the first 3 modes Stick, MF and Flat  (yeah, I know flat doesn't...bla) Single Connector Modes and the other is multiconnectors... ok they are called  planar  .... for consistency ... you'll get it... later... maybe. 
+			The warning section will appear when the addon detects a Problem. For example the target folder is not set. Or problems with the output format. 
+			The addon will use the output render settings set in the scene you start the archiving process from. When its set to PNG or other Imageformats this could amount to huge data sets cluttering your hard drive. 
+			Therefore you are explicitly asked to approve that you want images by checking the "Render as Image anyway" checkbox. Also be aware that audio rendering is not available for rendering images and even video formats like AVI RAW and JPEG. That is why the addon will recommend using Ffmpeg. 
 		 </div>		
  	</div>
 </div>
@@ -259,13 +265,21 @@
 
 <div class="row">
 	<div class="col-lg-3 col-sm-12">
-		<img src="Dokumentation_Pics/folder.jpg" class="img-thumbnail rounded mx-auto d-block">
+		<img src="Dokumentation_Pics/folderstructure.jpg" class="img-thumbnail rounded mx-auto d-block">
 	</div>
  
 
  	<div class="col-lg-9 col-sm-12 nextTo">
 		 <div>	
-		 	Audio blub 
+			Besides the Archived blendfile, the target folder can contain several folders namely
+		<ul>
+			<li>Audio,</li>
+			<li>Fonts,</li>
+			<li>ImgSequences and</li>
+			<li>Video</li>
+		</ul>
+		if thoses types were part of the project, respectively. The subfolders are named like the folder the footage came from with the additon of a number to avoid name duplications. 
+		Videos derived from the "Collect Snippets"-Modes will be sorted into Snippets_[number] folder in the video mainfolder. 
 		 </div>		
  	</div>
 </div>
@@ -284,18 +298,15 @@
 
  	<div class="col-lg-12 col-sm-12 nextTo">
 		 <div>	
-		 	When you select a Connector several colorful symbols appear around the connecotor's origin (only avaiable when the addon is installed and initalized). These are controls to change several settings and, hence, the appearance of the connector. From bottom to top:
+		 	
 		 	
 		 	<ul>
-		 		<li> Transparency is not available in most videoformats. </li>
-				<li>Audio strips will be rendered as video file due to blenders (or mine?) inability to render mp3, wav or similar audio files. The addon will show a warning when the render format is not </li>
-			 	<li>Rendered movie strips will be without audio. This can only be avoided by packaging both together in a metastrip to get the video file with its audio</li>
-			 	<li>strips will be ignored for rendering </li>
+		 		<li>Transparency is not available in all (most?) videoformats. Therefore, rendering sequences that need transparency with Collect Snippets will produce a black background and the alpha is lost. Set these strips to "Copy".</li>
+				<li>Audio strips will be rendered as video file due to blenders (or mine?) inability to render mp3, wav or similar audio files. The addon will show a warning when the render format is not supporting audio.</li>
+			 	<li>Rendered movie strips (Collect Snippets) will be without audio. This can only be avoided by packaging both together in a metastrip to get the video file with its audio</li>
 			 	<li>The addon will not delete files. However, the addon will overwrite all files in its way (same path and file names). Thus, we strongly recommend using an empty folder as new archive destination. We are not responsible for any data lost. </li>
-			 	<li>Rendersettings will be used as defined in the active scene where the archive process was started. </li>
-				<li>Rendered as set in render settings of the initial scene the addon is started from. However, different Colormanagement, Postprocessing, in different scenes will not be homogeniesded </li>
-				<li>In addition, using any Gizmos will also change the settings in the panel, too. This can also allow to figure out, what (the heck) 'this' gizmo does.</li>
-				<li>All sequences will be rendered independent of the set frame range. However, strips in negative frame range not get rendered.</li>
+			 	<li>Render settings will be used as defined in the active scene where the archive process was started.  However, different color management, postprocessing, in different scenes will not be homogenised. Tell me if you really need that </li></li>
+				<li>All sequences will be rendered independent of the intially set frame range. However, strips in negative frame range are not rendered.</li>
 			</ul>
 		 	
 		 </div>		

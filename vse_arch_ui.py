@@ -259,7 +259,7 @@ class PP_PT_VSEArchiver_Menu(bpy.types.Panel):
                         subcol.label(text="Target and Blendfile have the same path. Blend will be overwriten.")
                     
                     if not has_equal_seq or not has_equal_met:
-                        subcol.label(text="Update Data!")
+                        subcol.label(text="Update Sequence Data!")
                     
                     if is_image:
                         subcol.label(text="Imageformat selected for render!")
