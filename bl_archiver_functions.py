@@ -3,7 +3,13 @@ import os
 import json
 from .bl_archiver_properties import Bl_Archiver_PropGroup
 from pathlib import Path
+import shutil
+import os 
+import ntpath
+import copy
 
+from .archiver_general import equalize_directory, split_filepath, get_directorynumber, contentlist_from_dictionary
+  
 
 #from .vse_arch_functions import collect_moviclips, collect_sounds,collect_images, remap_moviclips, remap_sounds, remap_images, remap_fonts, copy_files
 from bpy.app.handlers import persistent
@@ -18,38 +24,32 @@ def load_handler(context: bpy.context):#all_filepathes
     extern_all_filepathes = read_json(json_filepath, all_filepathes) 
     
     print(f'I m open {all_filepathes}')
+    print(f'read from json {extern_all_filepathes}')
     own_filepath = bpy.path.abspath('//')
-    
-    if extern_all_filepathes["Scan"] == own_filepath:
-        print('checking opened blend!!')
-        blends_to_check = all_filepathes['blends_to_check']
-        
-        ###find linked data 
-        all_filepathes = get_linked_data(context, all_filepathes)
-        all_filepathes = get_linked_blends(context, all_filepathes)
-        
-        
-        ####copy files 
-        to_copy, all_filepathes = whats_new(extern_all_filepathes, all_filepathes)
-        errorlist = copy_files(to_copy)
-        
-        ###merge the dictionaries
-        all_filepathes.update(extern_all_filepathes)
-        
-        remap_data(context, all_filepathes)
-        
-        #remove this blend from blends to check 
-        blends_to_check = blends_to_check.remove(own_filepath)
-        
-        
-        write_json(json_filepath, all_filepathes)
-        #print(f'I"m subs own_filepath {own_filepath}')
-        #print(f'blends to check in sub {blends_to_check}')
-        #if not bpy.context.scene.bl_archiver.is_main_file:
-         # os.path.abspath(bpy.path.abspath('//'))
-        #if own_filepath in blends_to_check:
-        bpy.ops.wm.window_close()
-    #return res # all_filepathes
+    if extern_all_filepathes["Scan"] != '':
+        if extern_all_filepathes["Scan"] == own_filepath:
+            print('checking opened blend!!')
+            blends_to_check = all_filepathes['blends_to_check']
+            
+            ###find linked data 
+            all_filepathes = get_linked_data(context, all_filepathes)
+            all_filepathes = get_linked_blends(context, all_filepathes)
+            
+            
+            ####copy files 
+            to_copy, all_filepathes = whats_new(extern_all_filepathes, all_filepathes)
+            errorlist = copy_files(to_copy)
+            
+            ###merge the dictionaries
+            all_filepathes.update(extern_all_filepathes)
+            
+            remap_data(context, all_filepathes)
+            
+            #remove this blend from blends to check 
+            blends_to_check = blends_to_check.remove(own_filepath)
+            write_json(json_filepath, all_filepathes)
+            bpy.ops.wm.window_close()
+   
 
 bpy.app.handlers.load_post.append(load_handler)
 
@@ -103,7 +103,7 @@ def read_json(json_filepath, all_filepathes):
     #filename = "user_rasps.json"
 
     #folderpath = FM.appdatafoldername
-    #path = json_filepath#'C:\\Blender\\3.5\\scripts\\addons\\vse_archiver\\blend_archiver.json'
+    json_filepath = 'C:\\Blender\\3.5\\scripts\\addons\\vse_archiver\\blend_archiver.json'
 
     #my_file = Path("user_rasps.json")
     my_file = Path(json_filepath)
@@ -118,7 +118,8 @@ def read_json(json_filepath, all_filepathes):
     return all_filepathes
 
 def get_json_filepath():
-    return 'C:\\Blender\\3.5\\scripts\\addons\\vse_archiver\\blend_archiver.json'
+    json_filepath = "C:\\Blender\\3.5\\scripts\\addons\\vse_archiver\\blend_archiver.json" 
+    return json_filepath
 
 
 def start_archiving(context):
@@ -207,7 +208,7 @@ def get_filepathes_from_blend(all_filepathes):
     write_json(get_json_filepath, all_filepathes)
     
     print(f'starting sub file {filepath}')
-    p = subprocess.Popen([bpy.app.binary_path, '-b', all_filepathes["linked_file"], ]) # , 
+    p = subprocess.Popen([bpy.app.binary_path, '-b', filepath ])  
     
     #subprocess.Popen([bpy.app.binary_path, settings["linked_file"]])
     #
@@ -316,7 +317,7 @@ def remap_images(context, filepathes):
 
 def get_video_target_path(context, filepath, vid_directories):
     #print(f'In get video path filepath {filepath} directory {directory} vid_directories {vid_directories} ')
-    arch_props = context.scene.vse_archiver
+    arch_props = context.scene.bl_archiver
     targetfolder = arch_props.target_folder
     videofolder = arch_props.target_video_folder
     
@@ -350,7 +351,7 @@ def get_video_target_path(context, filepath, vid_directories):
 
 
 def get_audio_target_path(context, filepath, audio_directories, video_directories): 
-    arch_props = context.scene.vse_archiver
+    arch_props = context.scene.bl_archiver
     targetfolder = arch_props.target_folder
     directory, basename = split_filepath(filepath)
     print(f'audio target path beginning dir {directory} basename {basename}')
@@ -402,7 +403,7 @@ def get_audio_target_path(context, filepath, audio_directories, video_directorie
     return audio_target_path, audio_directories, video_directories
 
 def get_font_target_path(context, filepath, font_directories ):
-    arch_props = context.scene.vse_archiver
+    arch_props = context.scene.bl_archiver
     targetfolder = arch_props.target_folder
     fontfolder = arch_props.target_font_folder
     directory, basename = split_filepath(filepath)
@@ -429,7 +430,7 @@ def get_font_target_path(context, filepath, font_directories ):
     return font_target_path, font_directories
 
 def get_imgseq_target_path(context, filename, directory, imgseq_directories):
-    arch_props = context.scene.vse_archiver
+    arch_props = context.scene.bl_archiver
     targetfolder = arch_props.target_folder
     imgseqfolder = arch_props.target_imgseq_folder
 
@@ -457,3 +458,28 @@ def get_imgseq_target_path(context, filename, directory, imgseq_directories):
         imgseq_directories[directory]= target_folder
         print(f'get imseq path for subfolder {subfoldername}  filename {filename} imgseq_directories {imgseq_directories}')
     return imgseq_targetpath, imgseq_directories
+
+
+
+def copy_files(filepathes):
+    print(f'filepathes before copying:  ' )
+    #easy read print
+    #for d in filepathes:
+    #    print(f' {d} : {filepathes[d]} ')
+    ###
+    errorlist = []
+    for srcpath in filepathes.items():
+        if srcpath[0] != srcpath[1]:
+            targetpath, basename = split_filepath(srcpath[1])
+            os.makedirs(targetpath, exist_ok=True)
+            try:
+                copy_file(srcpath[0], targetpath)
+            except:
+                errorlist.append(f'Error copying from {srcpath[0]} to {targetpath}. Probably source file missing or no writing rights.')
+        else:
+            print(f'ignored copying file {srcpath[0]}; target path equals sourcepath ')
+            
+    return errorlist
+
+def copy_file(src, dst):
+    shutil.copy2(src, dst)

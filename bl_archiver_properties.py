@@ -16,3 +16,21 @@ class Bl_Archiver_PropGroup(bpy.types.PropertyGroup):
     
     json_filepath:bpy.props.StringProperty(
         name="Json Path", subtype = "DIR_PATH")
+    
+    target_video_folder: bpy.props.StringProperty(
+        name="Video Folder Name", default = 'Video')
+    
+    target_audio_folder: bpy.props.StringProperty(
+        name="Audio Folder Name", default = 'Audio')
+    
+    target_image_folder: bpy.props.StringProperty(
+        name="Single Image Folder Name", default = 'SingleImg')
+
+    target_imgseq_folder: bpy.props.StringProperty(
+        name="Image Sequence Folder Name", default = 'ImgSequences')
+    
+    target_font_folder: bpy.props.StringProperty(
+        name="Fonts Folder Name", default = 'Fonts')
+    
+    target_snippet_folder: bpy.props.StringProperty(
+        name="Snippets Folder Name", default = 'Snippets')
