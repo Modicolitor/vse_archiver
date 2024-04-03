@@ -772,7 +772,7 @@ def set_rendersettings(context):
         sc.render.image_settings.use_jpeg2k_cinema_48 = context.scene.render.image_settings.use_jpeg2k_cinema_48
         sc.render.image_settings.use_jpeg2k_ycc = context.scene.render.image_settings.use_jpeg2k_ycc
         sc.render.image_settings.exr_codec = context.scene.render.image_settings.exr_codec
-        sc.render.image_settings.use_zbuffer = context.scene.render.image_settings.use_zbuffer
+        #sc.render.image_settings.use_zbuffer = context.scene.render.image_settings.use_zbuffer
         sc.render.image_settings.use_preview = context.scene.render.image_settings.use_preview
         sc.render.image_settings.tiff_codec = context.scene.render.image_settings.tiff_codec
         

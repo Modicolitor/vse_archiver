@@ -11,7 +11,7 @@ import copy
 from .archiver_general import equalize_directory, split_filepath, get_directorynumber, contentlist_from_dictionary
   
 
-#from .vse_arch_functions import collect_moviclips, collect_sounds,collect_images, remap_moviclips, remap_sounds, remap_images, remap_fonts, copy_files
+#from .vse_arch_functions import collect_moviclips, collect_sounds,collect_images, remap_moviclips, remap_sounds, remap_images, remap_fonts, 
 from bpy.app.handlers import persistent
 
 
@@ -31,6 +31,7 @@ def load_handler(context: bpy.context):#all_filepathes
             print('checking opened blend!!')
             blends_to_check = all_filepathes['blends_to_check']
             
+            bpy.ops.file.make_paths_absolute()
             ###find linked data 
             all_filepathes = get_linked_data(context, all_filepathes)
             all_filepathes = get_linked_blends(context, all_filepathes)
@@ -39,6 +40,7 @@ def load_handler(context: bpy.context):#all_filepathes
             ####copy files 
             to_copy, all_filepathes = whats_new(extern_all_filepathes, all_filepathes)
             errorlist = copy_files(to_copy)
+            print(f'Errorlist !!! {errorlist}')
             
             ###merge the dictionaries
             all_filepathes.update(extern_all_filepathes)
@@ -123,6 +125,10 @@ def get_json_filepath():
 
 
 def start_archiving(context):
+    arch_props = context.scene.bl_archiver
+    arch_props.target_folder = bpy.path.abspath(arch_props.target_folder)
+    
+    bpy.ops.file.make_paths_absolute()
     
     #set controll bool to indentify main file
     context.scene.bl_archiver.is_main_file = True
@@ -130,6 +136,7 @@ def start_archiving(context):
     json_filepath = get_json_filepath()
     write_json(json_filepath, all_filepathes)
     
+    all_filepathes['target_folder'] = arch_props.target_folder
        
     #blends_to_check = all_filepathes['blends_to_check']
     
@@ -139,18 +146,23 @@ def start_archiving(context):
     
     
     #it should be a while loop until all to check are worked through
-    while len(all_filepathes['blends_to_check']) != 0: 
-        all_filepathes = get_filepathes_from_blend(all_filepathes)
+    #while len(all_filepathes['blends_to_check']) != 0: 
+    #    all_filepathes = get_filepathes_from_blend(all_filepathes)
+
+
+
 
 
     print(all_filepathes['blends_to_check'])
+    write_json(json_filepath, all_filepathes)
     #print(filepathes)
     #print(imgseq_directories)
     
 def get_linked_data(context, all_filepathes):
     ####use blenddata collector von vse archiver
     print('here I should get all linked nonblendfiles ')
-    all_filepathes['filepathes'], all_filepathes['imgseq_directories'] = collect_images(context, all_filepathes['filepathes'], all_filepathes['imgseq_directories'])
+    all_filepathes['filepathes'], all_filepathes['imgseq_directories'] = collect_images(context, all_filepathes['filepathes'], all_filepathes['imgseq_directories'], all_filepathes)
+    print(f'after image finding {all_filepathes}')
     #collect_moviclips
     #collect_sounds
     #collect_images
@@ -163,7 +175,7 @@ def get_linked_blends(context, all_filepathes):
     for lib in bpy.data.libraries:
         if hasattr(lib, 'filepath'):
             if lib.filepath not in all_filepathes['blends_to_check']:
-                all_filepathes['blends_to_check'].append(lib.filepath)
+                all_filepathes['blends_to_check'].append(bpy.path.abspath(lib.filepath))
     print(f'found libaries ')
     print(all_filepathes['blends_to_check'])
     return all_filepathes
@@ -204,7 +216,7 @@ def get_filepathes_from_blend(all_filepathes):
     print(f'starting sub file {filepath}')
     #p = subprocess.Popen([bpy.app.binary_path, os.path.abspath(bpy.path.abspath(filepath)), '-b']) # , all_filepathes
     #all_filepathes["linked_file"] = os.path.abspath(bpy.path.abspath(filepath))
-    all_filepathes['Scan'] = os.path.abspath(bpy.path.abspath(filepath))
+    all_filepathes['Scan'] = os.path.abspath(filepath)
     write_json(get_json_filepath, all_filepathes)
     
     print(f'starting sub file {filepath}')
@@ -252,17 +264,18 @@ def collect_fonts(context, filepathes, font_directories):
             filepathes[font.filepath], font_directories = get_font_target_path(context, font.filepath, font_directories)
     return filepathes, font_directories
 
-def collect_images(context, filepathes, imgseq_directories):
+def collect_images(context, filepathes, imgseq_directories, all_filepathes):
     data = bpy.data 
     for img in data.images:
         if img.type == 'IMAGE':
-            if img.filepath  not in filepathes:
-                print(f'img.filepath {img.filepath}')
-                directory, basename = os.path.split(img.filepath)
+            
+            if bpy.path.abspath(img.filepath)  not in filepathes:
+                print(f'img.filepath {bpy.path.abspath(img.filepath)}')
+                directory, basename = os.path.split(os.path.abspath(img.filepath))
                 #n, imgseq_directories = get_directorynumber(directory, imgseq_directories)
                 print(f'directory,{directory}, basename {basename}')
                 
-                targetpath, imgseq_directories = get_imgseq_target_path(context, basename, directory, imgseq_directories)
+                targetpath, imgseq_directories = get_imgseq_target_path(context, basename, directory, imgseq_directories, all_filepathes)
                 
                 print(f'targetpath is weird {targetpath}')
                 imgseq_directories[directory] = targetpath
@@ -429,9 +442,9 @@ def get_font_target_path(context, filepath, font_directories ):
 
     return font_target_path, font_directories
 
-def get_imgseq_target_path(context, filename, directory, imgseq_directories):
+def get_imgseq_target_path(context, filename, directory, imgseq_directories, all_filepathes):
     arch_props = context.scene.bl_archiver
-    targetfolder = arch_props.target_folder
+    targetfolder = all_filepathes['target_folder']
     imgseqfolder = arch_props.target_imgseq_folder
 
     #'target_folder'maintarget\imgseqfolder\
